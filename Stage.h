@@ -1,6 +1,11 @@
 #pragma once
 #include "Engine/GameObject.h"
 
+enum OBJ {
+	ARROW,
+	BALL,
+	NUM
+};
 
 //■■シーンを管理するクラス
 class Stage : public GameObject
@@ -23,5 +28,6 @@ public:
 	void Release() override;
 
 private:
-	int hModel_;
+	int hModel_[NUM];
+
 };

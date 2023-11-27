@@ -66,6 +66,7 @@
     <ClCompile Include="Engine\Model.cpp">
       <Filter>ソースファイル\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="MapController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Simple3D.hlsl" />
@@ -119,6 +120,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Model.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="MapController.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

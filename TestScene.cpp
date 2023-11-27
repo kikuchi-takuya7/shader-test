@@ -1,4 +1,5 @@
 #include "TestScene.h"
+#include "MapController.h"
 #include "Engine/Input.h"
 #include "Engine/SceneManager.h"
 #include "Stage.h"
@@ -21,6 +22,8 @@ void TestScene::Initialize()
 {
  
     Instantiate<Stage>(this);
+    Instantiate<MapController>(this);
+    
 }
 
 //XV
