@@ -24,7 +24,7 @@
     <ProjectGuid>{d36bc85a-e52d-4464-ad64-9dc9b0d6cafd}</ProjectGuid>
     <RootNamespace>MyGameEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>MapEditor</ProjectName>
+    <ProjectName>Shader-Test</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
