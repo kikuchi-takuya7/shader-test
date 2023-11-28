@@ -264,6 +264,8 @@ void Fbx::Draw(Transform& transform)
 		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.diffuseColor = pMaterialList_[i].diffuse;
+		//cb.lightDirection = 
+		XMStoreFloat4(&cb.eyePos, Camera::GetEyePosition());
 		cb.isTexture = pMaterialList_[i].pTexture != nullptr;
 		//if (i == 1) {
 		//	cb.diffuseColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f); //ごり押しでマテリアルの色を変えることも可能
