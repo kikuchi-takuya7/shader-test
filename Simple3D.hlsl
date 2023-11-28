@@ -13,6 +13,8 @@ cbuffer global
 	float4x4	matWVP;			// ワールド・ビュー・プロジェクションの合成行列
 	float4x4	matNormal;           // ワールド行列
 	float4		diffuseColor;		// ディフューズカラー（マテリアルの色）
+	float4		lightDirection;
+	float4		eyePos;
 	bool		isTexture;		// テクスチャ貼ってあるかどうか
 };
 
@@ -24,14 +26,12 @@ struct VS_OUT
 	float4 pos  : SV_POSITION;	//位置
 	float2 uv	: TEXCOORD;		//UV座標
 	float4 color	: COLOR;	//色（明るさ）
-	float4 eyePos	: EYEPOS;   //視点座標
-
 };
 
 //───────────────────────────────────────
 // 頂点シェーダ
 //───────────────────────────────────────
-VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, float4 eyePos : EPOS)
+VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 {
 	//ピクセルシェーダーへ渡す情報
 	VS_OUT outData;
@@ -43,17 +43,11 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, f
 
 	//法線を回転
 	normal = mul(normal, matNormal);
-	outData.eyePos = eyePos
 
-	//float4 light = float4( 1.0, 0.8, -1.5, 0);    //光源の向き（この座標から光源が"来る"）こっち向いてるタイプもあれば逆のタイプもある
+	//float4 light = float4( 1.0, 0.8, -1.5, 0);    //光源の向き（この座標から光源が"来る"） くるタイプもあれば逆のタイプもある
 	float4 light = float4(-1, 0, 0, 0);
-	float4 tmp = light;
 	light = normalize(light);
-	
-	//light = -light;
-	float4 
-
-	outData.color = clamp(dot(normal, light), 0, 1);//clamp関数は0から1の値で返してくれるらしい。それ以上にも以下にもならず
+	outData.color = clamp(dot(normal, light), 0, 1);
 
 	//まとめて出力
 	return outData;
