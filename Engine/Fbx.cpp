@@ -269,7 +269,8 @@ void Fbx::Draw(Transform& transform)
 		cb.isTexture = pMaterialList_[i].pTexture != nullptr;
 		XMFLOAT4 n = XMFLOAT4(0, 1, 0, 0);
 
-		XMFLOAT3 r = 2.0 * n * dot(n, cb.lightDirection) - cb.lightDirection;
+		
+		XMFLOAT3 r = 2.0 * n * XMVector3Dot(n, cb.lightDirection) - cb.lightDirection;
 		//if (i == 1) {
 		//	cb.diffuseColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f); //ごり押しでマテリアルの色を変えることも可能
 		//	cb.isTexture = pMaterialList_[i].pTexture != nullptr;

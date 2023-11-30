@@ -26,7 +26,6 @@ void Stage::Update()
 //•`‰æ
 void Stage::Draw()
 {
-
 	
 	Model::SetTransform(hModel_[ARROW], transform_);
 	Model::Draw(hModel_[ARROW]);
@@ -45,7 +44,11 @@ void Stage::Draw()
 
 	rot = { 0,0,0 };
 	transform_.rotate_ = rot;
-	Model::SetTransform(hModel_[BALL], transform_);
+
+	Transform ball = transform_;
+	ball.position_.x = -2;
+	ball.rotate_.x = -90;
+	Model::SetTransform(hModel_[BALL], ball);
 	Model::Draw(hModel_[BALL]);
 
 
