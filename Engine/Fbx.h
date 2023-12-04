@@ -27,9 +27,10 @@ class Fbx
 
 	struct CONSTANT_BUFFER
 	{
-		XMMATRIX	matWVP;
-		XMMATRIX	matNormal;
-		XMFLOAT4	diffuseColor;		// ディフューズカラー（マテリアルの色）
+		XMMATRIX	matWVP;//ワールドビュープロジェクション
+		XMMATRIX	matW;//これを最近追加した（12/4）　//ワールド変換のみ
+		XMMATRIX	matNormal;//スケール×平行移動の逆行列
+		XMFLOAT4	diffuseColor;		// ディフューズカラー（fbxから持ってきた面の色:マテリアル）
 		XMFLOAT4	lightDirection;
 		XMFLOAT4	eyePos;
 		BOOL		isTexture;		// テクスチャ貼ってあるかどうか
@@ -54,6 +55,8 @@ class Fbx
 	std::vector<int> indexCount_;
 	//Texture* pTexture_;
 
+	XMFLOAT4 lightSourcePosition_;//ライトの位置をhlslに伝える変数
+
 public:
 
 	Fbx();
@@ -68,4 +71,5 @@ public:
 	void SetTexture();
 	void SetPipeline();
 	void Release();
+	void SetLightSource(XMFLOAT4 pos) { lightSourcePosition_ = pos; }
 };

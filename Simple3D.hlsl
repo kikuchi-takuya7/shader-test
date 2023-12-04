@@ -8,9 +8,10 @@ SamplerState	g_sampler : register(s0);	//サンプラー
 // コンスタントバッファ
 // DirectX 側から送信されてくる、ポリゴン頂点以外の諸情報の定義
 //───────────────────────────────────────
-cbuffer global
+cbuffer global:register(b0)
 {
 	float4x4	matWVP;			// ワールド・ビュー・プロジェクションの合成行列
+	
 	float4x4	matNormal;           // ワールド行列
 	float4		diffuseColor;		// ディフューズカラー（マテリアルの色）
 	float4		lightDirection;
@@ -45,7 +46,7 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 	normal = mul(normal, matNormal);
 
 	//float4 light = float4( 1.0, 0.8, -1.5, 0);    //光源の向き（この座標から光源が"来る"） くるタイプもあれば逆のタイプもある
-	float4 light = float4(-1, 0, 0, 0);
+	float4 light = lightDirection;
 	light = normalize(light);
 	outData.color = clamp(dot(normal, light), 0, 1);
 

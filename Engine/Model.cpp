@@ -80,4 +80,9 @@ namespace Model {
     {
     }
 
+	void SetLightDirection(int hModel_, XMFLOAT4 pos)
+	{
+		
+	}
+
 }
