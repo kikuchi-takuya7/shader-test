@@ -27,8 +27,9 @@ struct VS_OUT
 	float4 pos  : SV_POSITION;	//位置
 	float2 uv	: TEXCOORD;		//UV座標
 	float4 color	: COLOR;	//色（明るさ）
-	float4 eyev		:POSITION;
-	float4 normal	:NORMAL;
+	float4 eyev		:POSITION1;
+	float4 normal	:POSITION2;
+	float4 light	:POSITION3;
 };
 
 //───────────────────────────────────────
@@ -55,7 +56,7 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 
 	outData.color = saturate(dot(normal, light));
 	float4 posw = mul(pos, matW);
-	outData.eyev = eyePosition - posw;
+	outData.eyev = eyePos - posw;
 
 	//まとめて出力
 	return outData;
@@ -71,12 +72,12 @@ float4 PS(VS_OUT inData) : SV_Target
 	float4 ambentSource = float4(0.2, 0.2, 0.2, 1.0);//明るくすればツルツルする ここfloat4入れ忘れると値が全部1になって異常な程明るくなるから気をつけろよ！！！
 	float4 diffuse;
 	float4 ambient;
-	float4 NL = saturate(dot(inData.normal, normalize(lightPosition)));
-	float4 reflect = normalize(2 * NL * inData.normal - normalize(lightPosition));
+	float4 NL = saturate(dot(inData.normal, normalize(lightDirection)));
+	float4 reflect = normalize(2 * NL * inData.normal - normalize(lightDirection));
 	float4 specular = pow(saturate(dot(reflect, normalize(inData.eyev))), 8);
 
 	//内積の結果がマイナスの場合は鏡面反射は起こらない状態。マイナスのままではなく０にして計算する必要がある
-	if (isTexture ==  false) {
+	if (isTexture ==  true) {
 		diffuse = lightSource * g_texture.Sample(g_sampler, inData.uv) * inData.color;//拡散反射色
 		ambient = lightSource * g_texture.Sample(g_sampler, inData.uv) * ambentSource;//環境反射色
 	}

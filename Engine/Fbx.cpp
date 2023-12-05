@@ -1,6 +1,7 @@
 #include "Fbx.h"
 //#include "Texture.h"
 
+XMFLOAT4 LIGHT_DERECTION = { 1,5,0,1 };
 
 Fbx::Fbx(): pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr), pMaterialList_(nullptr), vertexCount_(0),polygonCount_(0),materialCount_(0)
 {
@@ -267,7 +268,7 @@ void Fbx::Draw(Transform& transform)
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
 		cb.diffuseColor = pMaterialList_[i].diffuse;
-		cb.lightDirection = lightSourcePosition_;
+		cb.lightDirection = LIGHT_DERECTION;
 		XMStoreFloat4(&cb.eyePos, Camera::GetEyePosition());
 		cb.isTexture = pMaterialList_[i].pTexture != nullptr;
 
