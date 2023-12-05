@@ -1,5 +1,6 @@
 #include "Stage.h"
 #include "Engine/Model.h"
+#include"Engine/Input.h"
 
 //コンストラクタ
 Stage::Stage(GameObject* parent)
@@ -21,6 +22,21 @@ void Stage::Initialize()
 //更新
 void Stage::Update()
 {
+	
+	if (Input::IsKey(DIK_W)) {
+		lightPos_.z += 0.1f;
+	}
+	if (Input::IsKey(DIK_A)) {
+		lightPos_.x -= 0.1f;
+	}
+	if (Input::IsKey(DIK_S)) {
+		lightPos_.z -= 0.1f;
+	}
+	if (Input::IsKey(DIK_D)) {
+		lightPos_.x += 0.1f;
+	}
+
+	//Direct3D::pContext_->VSSetConstantBuffers(1, 1, &pCBStageScene_);
 }
 
 //描画

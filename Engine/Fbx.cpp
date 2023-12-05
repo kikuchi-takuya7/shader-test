@@ -260,23 +260,21 @@ void Fbx::Draw(Transform& transform)
 	for (int i = 0; i < materialCount_; i++) {
 	//for (int i = materialCount_ - 1; i >= 0; i--) {
 
+
+
 		CONSTANT_BUFFER cb;
 		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
+		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
 		cb.diffuseColor = pMaterialList_[i].diffuse;
-		cb.lightDirection = XMFLOAT4(-1, 0, 0, 0);
+		cb.lightDirection = lightSourcePosition_;
 		XMStoreFloat4(&cb.eyePos, Camera::GetEyePosition());
 		cb.isTexture = pMaterialList_[i].pTexture != nullptr;
-		XMFLOAT4 n = XMFLOAT4(0, 1, 0, 0);
 
-		
-		XMFLOAT3 r = 2.0 * n * XMVector3Dot(n, cb.lightDirection) - cb.lightDirection;
 		//if (i == 1) {
 		//	cb.diffuseColor = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f); //ごり押しでマテリアルの色を変えることも可能
 		//	cb.isTexture = pMaterialList_[i].pTexture != nullptr;
 		//}
-		
-		
 		
 
 		D3D11_MAPPED_SUBRESOURCE pdata;

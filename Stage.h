@@ -29,5 +29,5 @@ public:
 
 private:
 	int hModel_[NUM];
-
+	XMFLOAT4 lightPos_;
 };
