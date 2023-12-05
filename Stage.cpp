@@ -36,7 +36,7 @@ void Stage::Update()
 		lightPos_.x += 0.1f;
 	}
 
-	
+	//Direct3D::pContext_->VSSetConstantBuffers(1, 1, &pCBStageScene_);
 }
 
 //•`‰æ
