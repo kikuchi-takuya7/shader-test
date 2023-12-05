@@ -25,4 +25,6 @@ namespace Model{
     void Release();
 
     void AllRelease();
+
+    void SetLightDirection(int hModel_, XMFLOAT4 pos);
 }
