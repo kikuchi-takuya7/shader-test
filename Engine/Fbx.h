@@ -22,6 +22,8 @@ class Fbx
 	{
 		Texture* pTexture;
 		XMFLOAT4	diffuse;
+		XMFLOAT4	specular;
+		FLOAT		shininess;
 		
 	};
 
@@ -33,6 +35,8 @@ class Fbx
 		XMFLOAT4	diffuseColor;		// ディフューズカラー（fbxから持ってきた面の色:マテリアル）
 		XMFLOAT4	lightDirection;
 		XMFLOAT4	eyePos;
+		XMFLOAT4	speculer;
+		FLOAT		shininess;		//ハイライトの強さ（MayaのCosinePower）
 		BOOL		isTexture;		// テクスチャ貼ってあるかどうか
 		
 	};
@@ -66,6 +70,7 @@ public:
 	void InitIndex(fbxsdk::FbxMesh* mesh);
 	void InitConstantBuffer();
 	void InitMaterial(fbxsdk::FbxNode* pNode);
+	void InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i);
 	void Draw(Transform& transform);
 	void SetMap(Transform& transform);
 	void SetTexture();

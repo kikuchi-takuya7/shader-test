@@ -16,6 +16,8 @@ cbuffer global:register(b0)
 	float4		diffuseColor;		// ディフューズカラー（マテリアルの色）
 	float4		lightDirection;
 	float4		eyePos;
+	float4		speculer;
+	float	    shininess;
 	bool		isTexture;		// テクスチャ貼ってあるかどうか
 };
 
@@ -74,7 +76,7 @@ float4 PS(VS_OUT inData) : SV_Target
 	float4 ambient;
 	float4 NL = saturate(dot(inData.normal, normalize(lightDirection)));
 	float4 reflect = normalize(2 * NL * inData.normal - normalize(lightDirection));
-	float4 specular = pow(saturate(dot(reflect, normalize(inData.eyev))), 8);
+	float4 specular = pow(saturate(dot(reflect, normalize(inData.eyev))), 8);//前までは8
 
 	//内積の結果がマイナスの場合は鏡面反射は起こらない状態。マイナスのままではなく０にして計算する必要がある
 	if (isTexture ==  true) {
