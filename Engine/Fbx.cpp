@@ -276,7 +276,7 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 		FbxDouble3  specular = FbxDouble3(0, 0, 0);
 
 		pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2], 1.0f); //ここでシンプル３D用のディヒューズを入れる
-		pMaterialList_[i].specular = XMFLOAT4(0, 0, 0, 0);
+		pMaterialList_[i].speculer = XMFLOAT4(0, 0, 0, 0);
 		pMaterialList_[i].shininess = 0;
 
 		//マヤで指定したマテリアルの種類のIDが同じなら（FbxSurfacePhongっていうmayaで設定したキラキラしたマテリアルなら）
@@ -284,7 +284,7 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 
 			//鏡面反射でツヤツヤするようにする
 			specular = pPhong->Specular;
-			pMaterialList_[i].specular = XMFLOAT4((float)specular[0], (float)specular[1], (float)specular[2], 1.0f);
+			pMaterialList_[i].speculer = XMFLOAT4((float)specular[0], (float)specular[1], (float)specular[2], 1.0f);
 			pMaterialList_[i].shininess = (float)pPhong->Shininess;///////////floatとFLOATどっちにキャストしよか
 		}
 		
@@ -341,14 +341,14 @@ void Fbx::Draw(Transform& transform)
 	//for (int i = materialCount_ - 1; i >= 0; i--) {
 
 
-
+		//コンスタントバッファに情報を渡す
 		CONSTANT_BUFFER cb;
 		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
 		cb.diffuseColor = pMaterialList_[i].diffuse;
-		cb.lightDirection = LIGHT_DERECTION;
-		XMStoreFloat4(&cb.eyePos, Camera::GetEyePosition());
+		/*cb.lightDirection = LIGHT_DERECTION;
+		XMStoreFloat4(&cb.eyePos, Camera::GetEyePosition());*/
 		cb.isTexture = pMaterialList_[i].pTexture != nullptr;
 
 		//if (i == 1) {
@@ -362,6 +362,8 @@ void Fbx::Draw(Transform& transform)
 		memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));	// データを値を送る
 
 		Direct3D::pContext_->Unmap(pConstantBuffer_, 0);	//再開
+
+		//Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
 
 		//頂点バッファ
 		UINT stride = sizeof(VERTEX);
@@ -452,6 +454,7 @@ void Fbx::SetPipeline()
 		offset = 0;
 		Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
 
+		//hlslのb0とかをここの　0,1みたいなのに対応してるみたいな
 		Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_); //頂点シェーダー用
 		Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_); //ピクセルシェーダー用
 

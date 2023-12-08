@@ -14,12 +14,16 @@ cbuffer global:register(b0)
 	float4x4	matW;			// ワールド返還行列とかだったっけ
 	float4x4	matNormal;           // ワールド行列
 	float4		diffuseColor;		// ディフューズカラー（マテリアルの色）
-	float4		lightDirection;
-	float4		eyePos;
 	float4		speculer;
 	float	    shininess;
 	bool		isTexture;		// テクスチャ貼ってあるかどうか
 };
+
+cbuffer global:register(b1)
+{
+	float4		lightDirection;
+	float4		eyePos;
+}
 
 //───────────────────────────────────────
 // 頂点シェーダー出力＆ピクセルシェーダー入力データ構造体
@@ -76,7 +80,7 @@ float4 PS(VS_OUT inData) : SV_Target
 	float4 ambient;
 	float4 NL = saturate(dot(inData.normal, normalize(lightDirection)));
 	float4 reflect = normalize(2 * NL * inData.normal - normalize(lightDirection));
-	float4 specular = pow(saturate(dot(reflect, normalize(inData.eyev))), 8);//前までは8
+	
 
 	//内積の結果がマイナスの場合は鏡面反射は起こらない状態。マイナスのままではなく０にして計算する必要がある
 	if (isTexture ==  true) {
@@ -87,6 +91,13 @@ float4 PS(VS_OUT inData) : SV_Target
 		diffuse = lightSource * diffuseColor * inData.color;//拡散反射色
 		ambient = lightSource * diffuseColor * ambentSource;//環境反射色
 	}
+
+	float4 specular = float4(0, 0, 0, 0);
+
+	if (speculer.a != 0) {
+		specular = pow(saturate(dot(reflect, normalize(inData.eyev))), shininess);//前までは8
+	}
+
 	return (diffuse + ambient + specular);//実際の色
 
 	//// Postarization

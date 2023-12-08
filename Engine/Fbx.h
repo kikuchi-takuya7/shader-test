@@ -1,5 +1,4 @@
 #pragma once
-
 #include <d3d11.h>
 #include <fbxsdk.h>
 #include <string>
@@ -22,7 +21,7 @@ class Fbx
 	{
 		Texture* pTexture;
 		XMFLOAT4	diffuse;
-		XMFLOAT4	specular;
+		XMFLOAT4	speculer;
 		FLOAT		shininess;
 		
 	};
@@ -33,10 +32,10 @@ class Fbx
 		XMMATRIX	matW;//これを最近追加した（12/4）　//ワールド変換のみ
 		XMMATRIX	matNormal;//スケール×平行移動の逆行列
 		XMFLOAT4	diffuseColor;		// ディフューズカラー（fbxから持ってきた面の色:マテリアル）
-		XMFLOAT4	lightDirection;
-		XMFLOAT4	eyePos;
-		XMFLOAT4	speculer;
-		FLOAT		shininess;		//ハイライトの強さ（MayaのCosinePower）
+		//XMFLOAT4	lightDirection;
+		//XMFLOAT4	eyePos;
+		//XMFLOAT4	speculer;
+		//FLOAT		shininess;		//ハイライトの強さ（MayaのCosinePower）
 		BOOL		isTexture;		// テクスチャ貼ってあるかどうか
 		
 	};
