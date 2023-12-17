@@ -4,7 +4,7 @@
 
 
 namespace {
-	const XMFLOAT4 DEF_LIGHT_POSITION{ 1,2,1,0 };
+	const XMFLOAT4 DEF_LIGHT_POSITION{ 1,2,-1,0 };
 }
 
 
@@ -19,11 +19,12 @@ Stage::Stage(GameObject* parent)
 void Stage::Initialize()
 {
 	//モデルデータのロード
-	hModel_[ARROW] = Model::Load("assets/Arrow.fbx");
-	assert(hModel_[ARROW] >= 0);
+	hModel_[DONUT] = Model::Load("assets/Ball.fbx");
+	assert(hModel_[DONUT] >= 0);
 
-	hModel_[BALL] = Model::Load("assets/Ball.fbx");
-	assert(hModel_[BALL] >= 0);
+	transform_.scale_ = XMFLOAT3(0.8f, 0.8f, 0.8f);
+
+	ballTrans_.scale_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
 	IntConstantBuffer_();
 }
@@ -32,19 +33,20 @@ void Stage::Initialize()
 void Stage::Update()
 {
 	
-	if (Input::IsKey(DIK_W)) {
+	if (Input::IsKey(DIK_UP)) {
 		lightPos_.z += 0.1f;
 	}
-	if (Input::IsKey(DIK_A)) {
+	if (Input::IsKey(DIK_LEFT)) {
 		lightPos_.x -= 0.1f;
 	}
-	if (Input::IsKey(DIK_S)) {
+	if (Input::IsKey(DIK_DOWN)) {
 		lightPos_.z -= 0.1f;
 	}
-	if (Input::IsKey(DIK_D)) {
+	if (Input::IsKey(DIK_RIGHT)) {
 		lightPos_.x += 0.1f;
 	}
 
+	SetLightPos(lightPos_);
 
 	CBUFF_STAGESCENE cb;
 	cb.lightPosition = DEF_LIGHT_POSITION;
@@ -66,29 +68,8 @@ void Stage::Update()
 void Stage::Draw()
 {
 	
-	Model::SetTransform(hModel_[ARROW], transform_);
-	Model::Draw(hModel_[ARROW]);
-
-	XMFLOAT3 rot = { 0,90,0 };
-	transform_.rotate_ = rot;
-
-	Model::SetTransform(hModel_[ARROW], transform_);
-	Model::Draw(hModel_[ARROW]);
-
-	rot = { 0,0,90 };
-	transform_.rotate_ = rot;
-
-	Model::SetTransform(hModel_[ARROW], transform_);
-	Model::Draw(hModel_[ARROW]);
-
-	rot = { 0,0,0 };
-	transform_.rotate_ = rot;
-
-	Transform ball = transform_;
-	ball.position_.x = -2;
-	ball.rotate_.x = -90;
-	Model::SetTransform(hModel_[BALL], ball);
-	Model::Draw(hModel_[BALL]);
+	Model::SetTransform(hModel_[DONUT], transform_);
+	Model::Draw(hModel_[DONUT]);
 
 
 }

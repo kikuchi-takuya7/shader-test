@@ -22,7 +22,7 @@ void TestScene::Initialize()
 {
  
     Instantiate<Stage>(this);
-    Instantiate<MapController>(this);
+    //Instantiate<MapController>(this);
     
 }
 

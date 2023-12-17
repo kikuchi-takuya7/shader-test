@@ -206,61 +206,7 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 	materialCount_ = pNode->GetMaterialCount();
 	pMaterialList_ = new MATERIAL[materialCount_];
 
-#if 0
-	for (int i = 0; i < materialCount_; i++)
-	{
-		//i番目のマテリアル情報を取得
-		FbxSurfaceMaterial* pMaterial = pNode->GetMaterial(i);
 
-		//テクスチャ情報
-		FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse); //mayaでテクスチャ表示させるボタンあるやん？あの情報らしいで
-
-		//テクスチャの数数
-		int fileTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>(); //テクスチャ貼ってあれば１以上出なければ０
-
-		//テクスチャあり
-		if (fileTextureCount)
-		{
-
-			FbxFileTexture* textureInfo = lProperty.GetSrcObject<FbxFileTexture>(0);
-			const char* textureFilePath = textureInfo->GetRelativeFileName();
-
-			//ファイル名+拡張だけにする
-			char name[_MAX_FNAME];	//ファイル名
-			char ext[_MAX_EXT];	//拡張子
-			_splitpath_s(textureFilePath, nullptr, 0, nullptr, 0, name, _MAX_FNAME, ext, _MAX_EXT); //今回ドライブとディレクトリ名はいらないので、ファイルの名前と拡張子だけ
-			wsprintf(name, "%s%s", name, ext);
-
-			//ファイルからテクスチャ作成
-			pMaterialList_[i].pTexture = new Texture;
-			HRESULT hr = pMaterialList_[i].pTexture->Load(name);
-			assert(hr == S_OK);
-
-		}
-
-		//テクスチャ無し
-		else
-		{
-			pMaterialList_[i].pTexture = nullptr;
-
-			//マテリアルの色
-			FbxSurfaceLambert* pMaterial = (FbxSurfaceLambert*)pNode->GetMaterial(i); //テクスチャがない時だけ色をディヒューズに入れる
-			FbxDouble3  diffuse = pMaterial->Diffuse;
-			
-
-			pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2], 1.0f); //ここでシンプル３D用のディヒューズを入れる
-		
-			//マヤで指定したマテリアルの種類のIDが同じなら（FbxSurfacePhongっていうクラスなら）
-			if (pMaterial->GetClassId().Is(FbxSurfacePhong::ClassId)) {
-
-				//specular = pPhong->Specular;
-				pMaterialList_[i].specular = XMFLOAT4(0, 0, 0, 0);
-				pMaterialList_[i].shininess = 0;
-			}
-		}
-	}
-
-#else
 	for (int i = 0; i < materialCount_; i++)
 	{
 		//i番目のマテリアル情報を取得
@@ -273,26 +219,25 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 		// 環境光＆拡散反射光＆鏡面反射光の反射成分値を取得
 		FbxDouble3  ambient = pPhong->Ambient;
 		FbxDouble3  diffuse = pPhong->Diffuse;
-		FbxDouble3  specular = FbxDouble3(0, 0, 0);
+		
 
 		pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2], 1.0f); //ここでシンプル３D用のディヒューズを入れる
-		pMaterialList_[i].speculer = XMFLOAT4(0, 0, 0, 0);
-		pMaterialList_[i].shininess = 0;
+		pMaterialList_[i].ambient = XMFLOAT4((float)ambient[0], (float)ambient[1], (float)ambient[2], 1.0f);
+		pMaterialList_[i].specular = XMFLOAT4(0, 0, 0, 0);
+		pMaterialList_[i].shininess = 1;
 
 		//マヤで指定したマテリアルの種類のIDが同じなら（FbxSurfacePhongっていうmayaで設定したキラキラしたマテリアルなら）
 		if (pMaterial->GetClassId().Is(FbxSurfacePhong::ClassId)) {
 
 			//鏡面反射でツヤツヤするようにする
-			specular = pPhong->Specular;
-			pMaterialList_[i].speculer = XMFLOAT4((float)specular[0], (float)specular[1], (float)specular[2], 1.0f);
-			pMaterialList_[i].shininess = (float)pPhong->Shininess;///////////floatとFLOATどっちにキャストしよか
+			FbxDouble3 specular = pPhong->Specular;
+			pMaterialList_[i].specular = XMFLOAT4((float)specular[0], (float)specular[1], (float)specular[2], 1.0f);
+			FbxDouble shininess = pPhong->Shininess;
+			pMaterialList_[i].shininess = shininess;///////////floatとFLOATどっちにキャストしよか
 		}
 		
 		InitTexture(pMaterial, i);
 	}
-
-
-#endif
 }
 
 void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
@@ -307,7 +252,7 @@ void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 	int fileTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>(); //テクスチャ貼ってあれば１以上出なければ０
 
 	//テクスチャあり
-	if (fileTextureCount > 0)
+	if (fileTextureCount)
 	{
 
 		FbxFileTexture* textureInfo = lProperty.GetSrcObject<FbxFileTexture>(0);
@@ -346,9 +291,14 @@ void Fbx::Draw(Transform& transform)
 		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
+
+		//各光の情報を入れる
 		cb.diffuseColor = pMaterialList_[i].diffuse;
-		/*cb.lightDirection = LIGHT_DERECTION;
-		XMStoreFloat4(&cb.eyePos, Camera::GetEyePosition());*/
+		cb.ambientColor = pMaterialList_[i].ambient;
+		cb.specularColor = pMaterialList_[i].specular;
+		cb.shininess = pMaterialList_[i].shininess;
+
+
 		cb.isTexture = pMaterialList_[i].pTexture != nullptr;
 
 		//if (i == 1) {
