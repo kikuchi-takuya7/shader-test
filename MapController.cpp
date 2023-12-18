@@ -17,7 +17,7 @@ MapController::~MapController()
 //‰Šú‰»
 void MapController::Initialize()
 {
-    transform_.rotate_.x = 45.0f;
+    //transform_.rotate_.x = 45.0f;
 }
 
 //XV

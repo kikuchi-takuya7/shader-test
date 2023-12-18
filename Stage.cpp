@@ -19,8 +19,11 @@ Stage::Stage(GameObject* parent)
 void Stage::Initialize()
 {
 	//モデルデータのロード
-	hModel_[DONUT] = Model::Load("assets/Ball.fbx");
+	hModel_[DONUT] = Model::Load("assets/Donut.fbx");
 	assert(hModel_[DONUT] >= 0);
+
+	hModel_[BALL] = Model::Load("assets/Ball.fbx");
+	assert(hModel_[BALL] >= 0);
 
 	transform_.scale_ = XMFLOAT3(0.8f, 0.8f, 0.8f);
 
@@ -45,11 +48,19 @@ void Stage::Update()
 	if (Input::IsKey(DIK_RIGHT)) {
 		lightPos_.x += 0.1f;
 	}
+	if (Input::IsKey(DIK_LSHIFT)) {
+		lightPos_.y += 0.1f;
+	}
+	if (Input::IsKey(DIK_LCONTROL)) {
+		lightPos_.y -= 0.1f;
+	}
+
 
 	SetLightPos(lightPos_);
+	ballTrans_.position_ = XMFLOAT3(lightPos_.x, lightPos_.y, lightPos_.z);
 
 	CBUFF_STAGESCENE cb;
-	cb.lightPosition = DEF_LIGHT_POSITION;
+	cb.lightPosition = lightSourcePosition_;
 	XMStoreFloat4(&cb.eyePos, Camera::GetEyePosition());
 
 	//D3D11_MAPPED_SUBRESOURCE pdata;
@@ -71,6 +82,8 @@ void Stage::Draw()
 	Model::SetTransform(hModel_[DONUT], transform_);
 	Model::Draw(hModel_[DONUT]);
 
+	Model::SetTransform(hModel_[BALL], ballTrans_);
+	Model::Draw(hModel_[BALL]);
 
 }
 
