@@ -59,6 +59,7 @@ class Fbx
 	//Texture* pTexture_;
 
 	XMFLOAT4 lightSourcePosition_;//ƒ‰ƒCƒg‚ÌˆÊ’u‚ğhlsl‚É“`‚¦‚é•Ï”
+	Texture* pToonTex_;
 
 public:
 
@@ -71,9 +72,6 @@ public:
 	void InitMaterial(fbxsdk::FbxNode* pNode);
 	void InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i);
 	void Draw(Transform& transform);
-	void SetMap(Transform& transform);
-	void SetTexture();
-	void SetPipeline();
 	void Release();
 	void SetLightSource(XMFLOAT4 pos) { lightSourcePosition_ = pos; }
 };

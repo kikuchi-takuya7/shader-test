@@ -68,6 +68,9 @@ HRESULT Fbx::Load(std::string fileName)
 
 	//マネージャ解放
 	pFbxManager->Destroy();
+	pToonTex_ = new Texture;
+	pToonTex_->Load("Assets\\Toon.png");//画像はまだ適当
+
 	return S_OK;
 }
 
@@ -336,91 +339,22 @@ void Fbx::Draw(Transform& transform)
 			Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
 		}
 
-		Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
-
-	}
-	//SetTexture();
-
-	//Direct3D::pContext_->Unmap(pConstantBuffer_, 0);	//再開
-
-	//SetPipeline();
-	
-}
-
-void Fbx::SetMap(Transform& transform)
-{
-	CONSTANT_BUFFER cb;
-	cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
-	cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
-	/*cb.diffuseColor = pMaterialList_[i].diffuse;
-	cb.isTexture = pMaterialList_[i].pTexture != nullptr;*/
-
-
-	D3D11_MAPPED_SUBRESOURCE pdata;
-	Direct3D::pContext_->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);	// GPUからのデータアクセスを止める
-	memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));	// データを値を送る
-
-	
-}
-
-void Fbx::SetTexture()
-{
-	//ID3D11SamplerState* pSampler = pMaterialList_[i].pTexture->GetSampler();
-	//Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
-
-	//ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
-	//Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
-
-	//Direct3D::pContext_->Unmap(pConstantBuffer_, 0);	//再開
-}
-
-
-void Fbx::SetPipeline()
-{
-
-	//for (int i = 0; i < materialCount_; i++) {
-	for (int i = materialCount_ - 1; i >= 0; i--) {
-
-		
-
-		if (pMaterialList_[i].pTexture)
-		{
-			ID3D11SamplerState* pSampler = pMaterialList_[i].pTexture->GetSampler();
-			Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
-			ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
-			Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
-		}
-
-
-		Direct3D::pContext_->Unmap(pConstantBuffer_, 0);	//再開
-
-		//頂点バッファ
-		UINT stride = sizeof(VERTEX);
-		UINT offset = 0;
-		Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
-
-		// インデックスバッファーをセット
-		stride = sizeof(int);
-		offset = 0;
-		Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
-
-		//hlslのb0とかをここの　0,1みたいなのに対応してるみたいな
-		Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_); //頂点シェーダー用
-		Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_); //ピクセルシェーダー用
+		ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
+		Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);//(hlslでレジスターがt1だから)
 
 		Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
 
 	}
-
 	
-
 }
+
 
 void Fbx::Release()
 {
 	//SAFE_RELEASE(pTexture_);
 	//SAFE_DELETE(pTexture_);
 
+	SAFE_DELETE(pToonTex_);
 	SAFE_RELEASE(pConstantBuffer_);
 	//SAFE_RELEASE(pIndexBuffer_);
 	SAFE_DELETE(pIndexBuffer_);
