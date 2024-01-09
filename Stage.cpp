@@ -63,16 +63,12 @@ void Stage::Update()
 	cb.lightPosition = lightSourcePosition_;
 	XMStoreFloat4(&cb.eyePos, Camera::GetEyePosition());
 
-	//D3D11_MAPPED_SUBRESOURCE pdata;
-	//Direct3D::pContext_->Map(pCBStageScene_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);	// GPUからのデータアクセスを止める
-	//memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));	// データを値を送る
-
-	//Direct3D::pContext_->Unmap(pCBStageScene_, 0);	//再開
-
 	Direct3D::pContext_->UpdateSubresource(pCBStageScene_, 0, NULL, &cb, 0, 0);
 
 	Direct3D::pContext_->VSSetConstantBuffers(1, 1, &pCBStageScene_);
 	Direct3D::pContext_->PSSetConstantBuffers(1, 1, &pCBStageScene_);
+
+	transform_.rotate_.y += 1;
 }
 
 //描画
