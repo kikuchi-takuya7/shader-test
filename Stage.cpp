@@ -30,6 +30,7 @@ void Stage::Initialize()
 	ballTrans_.scale_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
 	IntConstantBuffer_();
+	lightPos_.z = -1;
 }
 
 //çXêV

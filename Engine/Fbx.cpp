@@ -335,6 +335,7 @@ void Fbx::Draw(Transform& transform)
 #if 1
 
 	Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
+	transform.Calclation();
 
 	for (int i = 0; i < materialCount_; i++) {
 
