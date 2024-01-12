@@ -44,33 +44,18 @@ struct VS_OUT
 //───────────────────────────────────────
 // 頂点シェーダ
 //───────────────────────────────────────
-VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
+float4 VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL):SV_POSITION
 {
-	//ピクセルシェーダーへ渡す情報
-	VS_OUT outData = (VS_OUT)0;
+	//面の法線の方に座標を引っ張る
+	//法線の隙間は勝手に補完してくれるから法線を少し大きくすればそれごと大きくなってく
+	
+	normal.w = 0;// wの情報は0。メモ帳にあるけどwの値は平行移動に使う値だから、なくなるッテ事？わからんけどたぶんそう？
+	pos = pos + normal * 0.05;
 
-	//ローカル座標に、ワールド・ビュー・プロジェクション行列をかけて
-	//スクリーン座標に変換し、ピクセルシェーダーへ
-
-	pos = pos + normal * 0.1;
-
-	outData.pos = mul(pos, matWVP);
-	outData.uv = uv;
-	normal.w = 0;// wの情報は0
-	//法線を回転
-	normal = mul(normal, matNormal);
-	normal = normalize(normal);
-	outData.normal = normal;
-
-	//float4 light = float4( 1.0, 0.8, -1.5, 0);    //光源の向き（この座標から光源が"来る"） くるタイプもあれば逆のタイプもある
-	float4 light = normalize(lightDirection);
-
-	outData.color = saturate(dot(normal, light));
-	float4 posw = mul(pos, matW);
-	outData.eyev = eyePos - posw;
-
-	//まとめて出力
-	return outData;
+	pos = mul(pos, matWVP);
+	
+	
+	return pos;
 }
 
 //───────────────────────────────────────
@@ -79,42 +64,8 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
 float4 PS(VS_OUT inData) : SV_Target
 {
 
-	float4 lightSource = float4(0.0, 0.0, 0.0, 1.0);//色の4原色
-	//float4 ambentSource = float4(0.2, 0.2, 0.2, 1.0);//明るくすればツルツルする ここfloat4入れ忘れると値が全部1になって異常な程明るくなるから気をつけろよ！！！
-	float4 diffuse;
-	float4 ambient;
-	float4 NL = dot(inData.normal, normalize(lightDirection));
-	float4 reflect = normalize(2 * NL * inData.normal - normalize(lightDirection));
-	float4 specular = pow(saturate(dot(reflect, normalize(inData.eyev))), shininess) * specularColor;
-
-	//画像の場所で明度みたいなん変えるならif分いらんよねみたいな
-	float4 n1 = float4(1 / 4.0, 1 / 4.0, 1 / 4.0, 1);
-	float4 n2 = float4(2 / 4.0, 2 / 4.0, 2 / 4.0, 1);
-	float4 n3 = float4(3 / 4.0, 3 / 4.0, 3 / 4.0, 1);
-	float4 n4 = float4(4 / 4.0, 4 / 4.0, 4 / 4.0, 1);
-
-	float4 tI = 0.1 * step(n1, inData.color) + 0.2 * step(n2, inData.color)
-			  + 0.3 * step(n3, inData.color) + 0.4 * step(n4, inData.color);
-
-	//内積の結果がマイナスの場合は鏡面反射は起こらない状態。マイナスのままではなく０にして計算する必要がある
-	if (isTexture == false) {
-		diffuse = lightSource * diffuseColor * tI;//拡散反射色
-		ambient = lightSource * diffuseColor * ambientColor;//環境反射色
-
-	}
-	else {
-
-		diffuse = lightSource * g_texture.Sample(g_sampler, inData.uv) * tI;//拡散反射色
-		ambient = lightSource * g_texture.Sample(g_sampler, inData.uv) * ambientColor;//環境反射色
-
-	}
-
-	return diffuse + ambient + specular;//実際の色
-	//return diffuse + ambient;
-
-	// Postarization
-	/*float4 output = floor(g_texture.Sample(g_sampler,inData.uv) * 8.0) / 8;
-	return output;*/
+	//ここは色とか明度を返すところだから、色を黒にして返してやる
+	return float4(0,0,0,1);
 }
 
 //色がちらちらしていろんな色に変わるパチンコ仕様になるときはDirect3Dの中のクリエイトシェーダーの中のSimple3Dと2Dの表記が間違ってる可能性大！！
