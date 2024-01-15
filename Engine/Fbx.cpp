@@ -283,7 +283,7 @@ void Fbx::Draw(Transform& transform)
 	Direct3D::SetShader(SHADER_TYPE::SHADER_OUTLINE);
 	transform.Calclation();//トランスフォームを計算
 
-	//一週目で輪郭用のちょっと大きい真っ黒モデルを描画して、二週目で真っ黒モデルの上からtoomのhlslを描画して
+	//一週目で輪郭用のちょっと大きい真っ黒モデルを描画して、二週目で真っ黒モデルの上からtoomのhlslを描画してる。マテリアルってのはmayaで作った一個のモデル
 	for (int f = 0; f < 2; f++) {
 
 		for (int i = 0; i < materialCount_; i++) {
