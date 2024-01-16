@@ -70,6 +70,7 @@ HRESULT Fbx::Load(std::string fileName)
 
 	//マネージャ解放
 	pFbxManager->Destroy();
+
 	pToonTex_ = new Texture;
 	pToonTex_->Load("Assets\\Toon.png");//画像はまだ適当
 
@@ -111,17 +112,31 @@ void Fbx::InitVertex(fbxsdk::FbxMesh* mesh)
 
 	for (int i = 0; i < polygonCount_; i++) {
 
+		mesh->GetElementTangentCount();
+		
 		//与えられたインデックスの配列の最初の頂点の情報を取ってくる？みたいな関数
 		int sIndex = mesh->GetPolygonVertexIndex(i);
-		
 		FbxGeometryElementTangent* t = mesh->GetElementTangent(0);
-		FbxVector4 tangent = t->GetDirectArray().GetAt(sIndex).mData;
-		for (int j = 0; j < 3; j++) {
+		
+		if (t) {
 			
-			//ベクトルにして渡す。詳細はしらん
-			int index = mesh->GetPolygonVertices()[sIndex + j];
-			vertices[index].tangent = { (float)tangent[0], (float)tangent[1], (float)tangent[2], (float)tangent[3] };
+			FbxVector4 tangent = t->GetDirectArray().GetAt(sIndex).mData;
+			for (int j = 0; j < 3; j++) {
+
+				//ベクトルにして渡す。詳細はしらん
+				int index = mesh->GetPolygonVertices()[sIndex + j];
+				vertices[index].tangent = { (float)tangent[0], (float)tangent[1], (float)tangent[2], 0.0f };
+			}
 		}
+		else {
+
+			for (int j = 0; j < 3; j++) {
+				int index = mesh->GetPolygonVertices()[sIndex + j];
+				vertices[index].tangent = { 0.0f, 0.0f, 0.0f, 0.0f };
+			}
+			
+		}
+		
 
 	}
 
@@ -346,11 +361,12 @@ void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 void Fbx::Draw(Transform& transform)
 {
 
-	Direct3D::SetShader(SHADER_TYPE::SHADER_OUTLINE);
+	//Direct3D::SetShader(SHADER_TYPE::SHADER_OUTLINE);
+	Direct3D::SetShader(SHADER_TYPE::SHADER_NORMALMAP);
 	transform.Calclation();//トランスフォームを計算
 
 	//一週目で輪郭用のちょっと大きい真っ黒モデルを描画して、二週目で真っ黒モデルの上からtoomのhlslを描画してる。マテリアルってのはmayaで作った一個のモデル
-	for (int f = 0; f < 2; f++) {
+	//for (int f = 0; f < 2; f++) {
 
 		for (int i = 0; i < materialCount_; i++) {
 
@@ -403,10 +419,10 @@ void Fbx::Draw(Transform& transform)
 		}
 
 		//2週目でtoonシェーダーになるように
-		Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
+		//Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
 		//transform.Calclation();
 
-	}
+	//}
 
 	
 }
