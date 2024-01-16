@@ -3,6 +3,8 @@
 
 XMFLOAT4 LIGHT_DERECTION = { 1,5,0,1 };
 
+#pragma warning(disable:4099)
+
 Fbx::Fbx(): pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr), pMaterialList_(nullptr), vertexCount_(0),polygonCount_(0),materialCount_(0)
 {
 }
@@ -74,6 +76,7 @@ HRESULT Fbx::Load(std::string fileName)
 	return S_OK;
 }
 
+//ここで法線の情報とかも取得してるよ
 //頂点バッファ準備
 void Fbx::InitVertex(fbxsdk::FbxMesh* mesh)
 {
@@ -104,6 +107,22 @@ void Fbx::InitVertex(fbxsdk::FbxMesh* mesh)
 			mesh->GetPolygonVertexNormal(poly, vertex, Normal);	//ｉ番目のポリゴンの、ｊ番目の頂点の法線をゲット
 			vertices[index].normal = XMVectorSet((float)Normal[0], (float)Normal[1], (float)Normal[2], 0.0f);
 		}
+	}
+
+	for (int i = 0; i < polygonCount_; i++) {
+
+		//与えられたインデックスの配列の最初の頂点の情報を取ってくる？みたいな関数
+		int sIndex = mesh->GetPolygonVertexIndex(i);
+		
+		FbxGeometryElementTangent* t = mesh->GetElementTangent(0);
+		FbxVector4 tangent = t->GetDirectArray().GetAt(sIndex).mData;
+		for (int j = 0; j < 3; j++) {
+			
+			//ベクトルにして渡す。詳細はしらん
+			int index = mesh->GetPolygonVertices()[sIndex + j];
+			vertices[index].tangent = { (float)tangent[0], (float)tangent[1], (float)tangent[2], (float)tangent[3] };
+		}
+
 	}
 
 	//頂点バッファ作成
@@ -204,6 +223,10 @@ void Fbx::InitConstantBuffer()
 	}
 }
 
+/// <summary>
+/// 色とか光加減はここで設定してる
+/// </summary>
+/// <param name="pNode"></param>
 void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 {
 	materialCount_ = pNode->GetMaterialCount();
@@ -218,7 +241,6 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 		//マテリアルの種類
 		FbxSurfacePhong* pPhong = (FbxSurfacePhong*)pMaterial; //テクスチャがない時だけ色をディヒューズに入れる
 		
-
 		// 環境光＆拡散反射光＆鏡面反射光の反射成分値を取得
 		FbxDouble3  ambient = pPhong->Ambient;
 		FbxDouble3  diffuse = pPhong->Diffuse;
@@ -243,10 +265,13 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 	}
 }
 
+/// <summary>
+/// InitMaterialで使ってるテクスチャの設定
+/// </summary>
+/// <param name="pMaterial"></param>
+/// <param name="i"></param>
 void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 {
-
-	pMaterialList_[i].pTexture = nullptr;
 
 	//テクスチャ情報
 	FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse); //mayaでテクスチャ表示させるボタンあるやん？あの情報らしいで
@@ -271,6 +296,47 @@ void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 		pMaterialList_[i].pTexture = new Texture;
 		HRESULT hr = pMaterialList_[i].pTexture->Load(name);
 		assert(hr == S_OK);
+
+	}
+	else {
+
+		//テクスチャ無し
+		pMaterialList_[i].pTexture = nullptr;
+	}
+
+	//ノーマルマップ用テクスチャ
+	{
+
+		//テクスチャ情報
+		FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sNormalMap); //mayaでテクスチャ表示させるボタンあるやん？あの情報らしいで
+
+		//テクスチャの数数
+		int fileTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>(); //テクスチャ貼ってあれば１以上出なければ０
+
+		//テクスチャあり
+		if (fileTextureCount)
+		{
+
+			FbxFileTexture* textureInfo = lProperty.GetSrcObject<FbxFileTexture>(0);
+			const char* textureFilePath = textureInfo->GetRelativeFileName();
+
+			//ファイル名+拡張だけにする
+			char name[_MAX_FNAME];	//ファイル名
+			char ext[_MAX_EXT];	//拡張子
+			_splitpath_s(textureFilePath, nullptr, 0, nullptr, 0, name, _MAX_FNAME, ext, _MAX_EXT); //今回ドライブとディレクトリ名はいらないので、ファイルの名前と拡張子だけ
+			wsprintf(name, "%s%s", name, ext);
+
+			//ファイルからテクスチャ作成
+			pMaterialList_[i].pNormalTexture = new Texture;
+			HRESULT hr = pMaterialList_[i].pNormalTexture->Load(name);
+			assert(hr == S_OK);
+
+		}
+		else {
+
+			//テクスチャ無し
+			pMaterialList_[i].pNormalTexture = nullptr;
+		}
 
 	}
 
@@ -322,6 +388,11 @@ void Fbx::Draw(Transform& transform)
 				Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
 				ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
 				Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
+			}
+			if (pMaterialList_[i].pNormalTexture) {
+				
+				ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
+				Direct3D::pContext_->PSSetShaderResources(2, 1, &pSRV);
 			}
 
 			ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
