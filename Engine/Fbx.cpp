@@ -110,6 +110,7 @@ void Fbx::InitVertex(fbxsdk::FbxMesh* mesh)
 		}
 	}
 
+	//タンジェント取得
 	for (int i = 0; i < polygonCount_; i++) {
 
 		mesh->GetElementTangentCount();
@@ -133,11 +134,8 @@ void Fbx::InitVertex(fbxsdk::FbxMesh* mesh)
 			for (int j = 0; j < 3; j++) {
 				int index = mesh->GetPolygonVertices()[sIndex + j];
 				vertices[index].tangent = { 0.0f, 0.0f, 0.0f, 0.0f };
-			}
-			
+			}	
 		}
-		
-
 	}
 
 	//頂点バッファ作成
@@ -323,7 +321,7 @@ void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 	{
 
 		//テクスチャ情報
-		FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sNormalMap); //mayaでテクスチャ表示させるボタンあるやん？あの情報らしいで
+		FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sBump); //mayaでテクスチャ表示させるボタンあるやん？あの情報らしいで
 
 		//テクスチャの数数
 		int fileTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>(); //テクスチャ貼ってあれば１以上出なければ０
@@ -342,15 +340,15 @@ void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 			wsprintf(name, "%s%s", name, ext);
 
 			//ファイルからテクスチャ作成
-			pMaterialList_[i].pNormalTexture = new Texture;
-			HRESULT hr = pMaterialList_[i].pNormalTexture->Load(name);
+			pMaterialList_[i].pNormalMap = new Texture;
+			HRESULT hr = pMaterialList_[i].pNormalMap->Load(name);
 			assert(hr == S_OK);
 
 		}
 		else {
 
 			//テクスチャ無し
-			pMaterialList_[i].pNormalTexture = nullptr;
+			pMaterialList_[i].pNormalMap = nullptr;
 		}
 
 	}
@@ -381,7 +379,9 @@ void Fbx::Draw(Transform& transform)
 			cb.ambientColor = pMaterialList_[i].ambient;
 			cb.specularColor = pMaterialList_[i].specular;
 			cb.shininess = pMaterialList_[i].shininess;
-			cb.isTexture = pMaterialList_[i].pTexture != nullptr;
+
+			cb.hasTexture = pMaterialList_[i].pTexture != nullptr;
+			cb.hasNormalMap = pMaterialList_[i].pNormalMap != nullptr;
 
 			Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
 
@@ -405,7 +405,8 @@ void Fbx::Draw(Transform& transform)
 				ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
 				Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
 			}
-			if (pMaterialList_[i].pNormalTexture) {
+
+			if (pMaterialList_[i].pNormalMap) {
 				
 				ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
 				Direct3D::pContext_->PSSetShaderResources(2, 1, &pSRV);

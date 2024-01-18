@@ -441,7 +441,7 @@ HRESULT Direct3D::InitNormalMap()
 		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(DirectX::XMVECTOR) * 2 ,	 D3D11_INPUT_PER_VERTEX_DATA, 0 },//法線
 		{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(DirectX::XMVECTOR) * 3 ,	 D3D11_INPUT_PER_VERTEX_DATA, 0 },//接線
 	};
-	hr = pDevice_->CreateInputLayout(layout, sizeof(layout)/sizeof(D3D11_INPUT_ELEMENT_DESC), pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &(shader_Bandle[SHADER_NORMALMAP].pVertexLayout_));
+	hr = pDevice_->CreateInputLayout(layout, ARRAYSIZE(layout), pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &(shader_Bandle[SHADER_NORMALMAP].pVertexLayout_));
 	if (FAILED(hr)) {
 		MessageBox(nullptr, "頂点インプットレイアウトの作成に失敗しました", "エラー", MB_OK);
 		return hr;

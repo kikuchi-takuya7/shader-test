@@ -3,18 +3,30 @@
 //───────────────────────────────────────
 Texture2D		g_texture : register(t0);	//テクスチャー
 SamplerState	g_sampler : register(s0);	//サンプラー
+Texture2D		normalTex : register(t1);
 
 //───────────────────────────────────────
 // コンスタントバッファ
 // DirectX 側から送信されてくる、ポリゴン頂点以外の諸情報の定義
 //───────────────────────────────────────
-cbuffer global
+cbuffer global:register(b0)
 {
 	float4x4	matWVP;			// ワールド・ビュー・プロジェクションの合成行列
-	float4x4	matNormal;           // ワールド行列
-	float4		diffuseColor;		// ディフューズカラー（マテリアルの色）
-	bool		isTexture;		// テクスチャ貼ってあるかどうか
+	float4x4	matW;           // ワールド行列
+	float4x4	matNormal;           //ノーマルのローカルへの変換行列から平行移動成分をとったやつ
+	float4		diffuseColor;		//マテリアルの色＝拡散反射係数
+	float4		ambientColor;		//環境光
+	float4		specularColor;		//鏡面反射＝ハイライトの係数
+	float		shininess;			//ハイライトの広がりの大きさ
+	int			hasTexture;			//テクスチャーが貼られているかどうか
+	int			hasNormalMap;		//ノーマルマップがあるかどうか
 };
+
+cbuffer gmodel:register(b1) {
+
+	float4		lightPosition;		//っ高原の位置
+	float4		eyePosition;		//支店位置＝カメラの位置
+}
 
 //───────────────────────────────────────
 // 頂点シェーダー出力＆ピクセルシェーダー入力データ構造体
@@ -23,27 +35,57 @@ struct VS_OUT
 {
 	float4 pos  : SV_POSITION;	//位置
 	float2 uv	: TEXCOORD;		//UV座標
-	float4 color	: COLOR;	//色（明るさ）
+	float4 eyev		:POSITION;	//ワールド座標に変換された視線ベクトル
+	float4 Neyev	:POSITION1;	//ノーマルマップ用の接空間に変換された視線ベクトル
+	float4 normal	:POSITION2; //法線ベクトル
+	float4 light	:POSITION3; //ライトを接空間に変換したベクトル
+	float4 color	:POSITION4;	//通常のランバートモデルの拡散反射の色
 };
 
 //───────────────────────────────────────
 // 頂点シェーダ
 //───────────────────────────────────────
-VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL)
+VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, float4 tangent : TANGENT)
 {
 	//ピクセルシェーダーへ渡す情報
-	VS_OUT outData;
+	VS_OUT outData = (VS_OUT)0;
 
 	//ローカル座標に、ワールド・ビュー・プロジェクション行列をかけて
 	//スクリーン座標に変換し、ピクセルシェーダーへ
 	outData.pos = mul(pos, matWVP);
-	outData.uv = uv;
+	outData.uv = (float2)uv;
 
-	//法線を回転
+	float3  binormal = cross(normal, tangent);
+
+	normal.w = 0;
 	normal = mul(normal, matNormal);
-	float4 light = float4(1, 0.8, -0.3, 0);//光が出てくる方向。こっち向いてるタイプ
+	normal = normalize(normal); //法線ベクトルをローカル座標に変換したやつ
+	outData.normal = normal;
+
+	tangent.w = 0;
+	tangent = mul(tangent, matNormal);
+	tangent = normalize(tangent); //接線ベクトルをローカル座標に変換したやつ
+
+	binormal = mul(binormal, matNormal);
+	binormal = normalize(binormal); //従法線ベクトルをローカル座標に変換したやつ
+
+	float4 posw = mul(pos, matW);
+	outData.eyev = eyePosition - posw; //ワールド座標の視線ベクトル
+
+	outData.Neyev.x = dot(outData.eyev, tangent);//接空間の視線ベクトル
+	outData.Neyev.y = dot(outData.eyev, binormal);
+	outData.Neyev.z = dot(outData.eyev, normal);
+	outData.Neyev.w = 0;
+
+	float4 light = normalize(lightPosition);
 	light = normalize(light);
-	outData.color = clamp(dot(normal, light), 0, 1);
+
+	outData.color = mul(light, normal);
+
+	outData.light.x = dot(light, tangent);//接空間の光源ベクトル
+	outData.light.y = dot(light, binormal);
+	outData.light.z = dot(light, normal);
+	outData.light.w = 0;
 
 	//まとめて出力
 	return outData;
@@ -56,19 +98,60 @@ float4 PS(VS_OUT inData) : SV_Target
 {
 
 	float4 lightSource = float4(1.0, 1.0, 1.0, 1.0);//色の4原色
-	float4 ambentSource = float4(0.2, 0.2, 0.2, 1.0);//明るくすればツルツルする ここfloat4入れ忘れると値が全部1になって異常な程明るくなるから気をつけろよ！！！
+	//float4 ambentSource = float4(0.2, 0.2, 0.2, 1.0);//明るくすればツルツルする ここfloat4入れ忘れると値が全部1になって異常な程明るくなるから気をつけろよ！！！
 	float4 diffuse;
 	float4 ambient;
 
-	if (isTexture) {
-		diffuse = lightSource * g_texture.Sample(g_sampler, inData.uv) * inData.color;//拡散反射色
-		ambient = lightSource * g_texture.Sample(g_sampler, inData.uv) * ambentSource;//環境反射色
+	if (hasNormalMap)
+	{
+		inData.light = normalize(inData.light);
+
+		float4 diffuse;
+		float4 ambient;
+		float4 specular;
+
+		float4 tmpNormal = normalTex.Sample(g_sampler, inData.uv) * 2 - 1;
+		tmpNormal.w = 0;
+		tmpNormal = normalize(tmpNormal);
+
+		float4 S = dot(tmpNormal, normalize(inData.light));
+		S = clamp(S, 0, 1);
+
+		float4 R = reflect(-inData.light, tmpNormal);
+		specular = pow(saturate(dot(R, inData.Neyev)), shininess) * specularColor;
+
+		/*if (hasTexture != 0)
+		{
+			diffuse = g_texture.Sample(g_sampler, inData.uv) * S;
+			ambient = g_texture.Sample(g_sampler, inData.uv) * ambientColor;
+		}
+		else
+		{
+			diffuse = diffuseColor * S;
+			ambient = diffuseColor * ambientColor;
+		}
+		return  diffuse + ambient + specular;*/
+
+		diffuse = diffuseColor * S;
+		return diffuse;
 	}
-	else {
-		diffuse = lightSource * diffuseColor * inData.color;//拡散反射色
-		ambient = lightSource * diffuseColor * ambentSource;//環境反射色
+	else
+	{
+		float4 NL = saturate(dot(inData.normal, normalize(lightPosition)));
+		float4 reflection = reflect(normalize(-lightPosition), inData.normal);
+		float4 specular = pow(saturate(dot(reflection, normalize(inData.eyev))), shininess) * specularColor;
+		if (hasTexture == 0)
+		{
+			diffuse = lightSource * diffuseColor * inData.color;
+			ambient = lightSource * diffuseColor * ambientColor;
+		}
+		else
+		{
+			diffuse = lightSource * g_texture.Sample(g_sampler, inData.uv) * inData.color;
+			ambient = lightSource * g_texture.Sample(g_sampler, inData.uv) * ambientColor;
+		}
+		return diffuse + ambient + specular;
 	}
-	return (diffuse + ambient);//実際の色
 }
 
 //色がちらちらしていろんな色に変わるパチンコ仕様になるときはDirect3Dの中のクリエイトシェーダーの中のSimple3Dと2Dの表記が間違ってる可能性大！！

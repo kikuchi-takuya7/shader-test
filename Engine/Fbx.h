@@ -20,7 +20,7 @@ class Fbx
 	struct MATERIAL
 	{
 		Texture*	pTexture;
-		Texture*	pNormalTexture;
+		Texture*	pNormalMap;//先生のはnormalMap
 		XMFLOAT4	diffuse;
 		XMFLOAT4	ambient;
 		XMFLOAT4	specular;
@@ -37,7 +37,8 @@ class Fbx
 		XMFLOAT4	ambientColor;
 		XMFLOAT4	specularColor;
 		FLOAT		shininess;		//ハイライトの強さ（MayaのCosinePower）
-		BOOL		isTexture;		// テクスチャ貼ってあるかどうか
+		BOOL		hasTexture;		// テクスチャ貼ってあるかどうか
+		BOOL		hasNormalMap;
 		
 	};
 
@@ -46,8 +47,8 @@ class Fbx
 	{
 		XMVECTOR position;//位置
 		XMVECTOR uv;//テクスチャ座標
-		XMVECTOR normal;//法線
-		XMVECTOR tangent;//接線
+		XMVECTOR normal;//法線ベクトル
+		XMVECTOR tangent;//接線ベクトル
 
 	};
 
