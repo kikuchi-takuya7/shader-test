@@ -110,32 +110,27 @@ void Fbx::InitVertex(fbxsdk::FbxMesh* mesh)
 		}
 	}
 
+
+	FbxGeometryElementTangent* t = mesh->GetElementTangent(0);
+
 	//タンジェント取得
 	for (int i = 0; i < polygonCount_; i++) {
 
-		mesh->GetElementTangentCount();
+		FbxVector4 tangent{ 0,0,0,0 };
 		
 		//与えられたインデックスの配列の最初の頂点の情報を取ってくる？みたいな関数
 		int sIndex = mesh->GetPolygonVertexIndex(i);
-		FbxGeometryElementTangent* t = mesh->GetElementTangent(0);
-		
 		if (t) {
 			
-			FbxVector4 tangent = t->GetDirectArray().GetAt(sIndex).mData;
-			for (int j = 0; j < 3; j++) {
-
-				//ベクトルにして渡す。詳細はしらん
-				int index = mesh->GetPolygonVertices()[sIndex + j];
-				vertices[index].tangent = { (float)tangent[0], (float)tangent[1], (float)tangent[2], 0.0f };
-			}
+			tangent = t->GetDirectArray().GetAt(sIndex).mData;
+			
 		}
-		else {
-
-			for (int j = 0; j < 3; j++) {
-				int index = mesh->GetPolygonVertices()[sIndex + j];
-				vertices[index].tangent = { 0.0f, 0.0f, 0.0f, 0.0f };
-			}	
-		}
+		
+		for (int j = 0; j < 3; j++) {
+			int index = mesh->GetPolygonVertices()[sIndex + j];
+			vertices[index].tangent = XMVectorSet((float)tangent[0], (float)tangent[1], (float)tangent[2], 0.0f);
+		}	
+		
 	}
 
 	//頂点バッファ作成
@@ -412,8 +407,8 @@ void Fbx::Draw(Transform& transform)
 				Direct3D::pContext_->PSSetShaderResources(2, 1, &pSRV);
 			}
 
-			ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
-			Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);//(hlslでレジスターがt1だから)
+			//ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
+			//Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);//(hlslでレジスターがt1だから)
 
 			Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
 
