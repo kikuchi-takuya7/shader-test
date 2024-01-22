@@ -271,7 +271,7 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 			FbxDouble3 specular = pPhong->Specular;
 			pMaterialList_[i].specular = XMFLOAT4((float)specular[0], (float)specular[1], (float)specular[2], 1.0f);
 			FbxDouble shininess = pPhong->Shininess;
-			pMaterialList_[i].shininess = shininess;///////////floatとFLOATどっちにキャストしよか
+			pMaterialList_[i].shininess = (float)shininess;///////////floatとFLOATどっちにキャストしよか
 		}
 		
 		InitTexture(pMaterial, i);
@@ -321,7 +321,7 @@ void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 	{
 
 		//テクスチャ情報
-		FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sBump); //mayaでテクスチャ表示させるボタンあるやん？あの情報らしいで
+		FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sBump); 
 
 		//テクスチャの数数
 		int fileTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>(); //テクスチャ貼ってあれば１以上出なければ０
