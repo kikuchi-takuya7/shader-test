@@ -153,7 +153,7 @@ float4 PS(VS_OUT inData) : SV_Target
 		if (hasTexture) {
 			result.x = inData.uv.x;
 		}
-		return result;
+		return result;//‚±‚ê‚Ìif•ª‚Ì‚Æ‚±‚È‚­‚¹‚Îˆê‰F‚Ío‚Ä‚­‚é
 	}
 }
 
