@@ -467,6 +467,8 @@ HRESULT Direct3D::InitNormalMap()
 	rdc.CullMode = D3D11_CULL_BACK; //後ろ側は描画しない処理
 	rdc.FillMode = D3D11_FILL_SOLID;//ワイヤーフレームだけ作るか塗るか
 	rdc.FrontCounterClockwise = FALSE; //時計回りに頂点を描画するか。FALSEだと時計回りに読み込むする
+	rdc.ScissorEnable = false;
+	rdc.MultisampleEnable = false;
 	hr = pDevice_->CreateRasterizerState(&rdc, &(shader_Bandle[SHADER_NORMALMAP].pRasterizerState_));
 	if (FAILED(hr)) {
 		MessageBox(nullptr, "ラスタライザの作成に失敗しました", "エラー", MB_OK);

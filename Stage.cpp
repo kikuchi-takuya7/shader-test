@@ -4,7 +4,7 @@
 
 
 namespace {
-	const XMFLOAT4 DEF_LIGHT_POSITION{ 1,2,-1,0 };
+	const XMFLOAT4 DEF_LIGHT_POSITION{ 1,2,1,0 };
 }
 
 
@@ -19,13 +19,13 @@ Stage::Stage(GameObject* parent)
 void Stage::Initialize()
 {
 	//モデルデータのロード
-	hModel_[DONUT] = Model::Load("assets/Donut.fbx");
+	hModel_[DONUT] = Model::Load("assets/Dice.fbx");
 	assert(hModel_[DONUT] >= 0);
 
 	hModel_[BALL] = Model::Load("assets/Ball.fbx");
 	assert(hModel_[BALL] >= 0);
 
-	transform_.scale_ = XMFLOAT3(0.8f, 0.8f, 0.8f);
+	transform_.scale_ = XMFLOAT3(2.0f, 2.0f, 2.0f);
 
 	ballTrans_.scale_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
