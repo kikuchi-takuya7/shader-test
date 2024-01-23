@@ -17,6 +17,8 @@ namespace Direct3D
 	ID3D11Texture2D* pDepthStencil;			//深度ステンシル
 	ID3D11DepthStencilView* pDepthStencilView;		//深度ステンシルビュー
 
+	ID3D11BlendState* pBlendState;
+
 	struct SHADER_BUNDLE {
 		ID3D11VertexShader* pVertexShader_ = nullptr;	//頂点シェーダー
 		ID3D11PixelShader* pPixelShader_ = nullptr;		//ピクセルシェーダー
@@ -121,8 +123,28 @@ HRESULT Direct3D::Initialize(int winW, int winH, HWND hWnd)
 	pDevice_->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
 	pDevice_->CreateDepthStencilView(pDepthStencil, NULL, &pDepthStencilView);
 
+	//ブレンドステート
+	D3D11_BLEND_DESC blendDesc;
+	ZeroMemory(&blendDesc, sizeof(blendDesc));
+	blendDesc.AlphaToCoverageEnable = FALSE;
+	blendDesc.IndependentBlendEnable = FALSE;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	pDevice_->CreateBlendState(&blendDesc, &pBlendState);
+
+	float blendFactor[4] = { D3D11_BLEND_ZERO,D3D11_BLEND_ZERO ,D3D11_BLEND_ZERO ,D3D11_BLEND_ZERO };
+	pContext_->OMSetBlendState(pBlendState, blendFactor, 0xfffffff);
+
 	//データを画面に描画するための一通りの設定（パイプライン）
 	pContext_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);  // データの入力種類を指定
+	pContext_->OMSetRenderTargets(1, &pRenderTargetView_, nullptr);
 	pContext_->OMSetRenderTargets(1, &pRenderTargetView_, pDepthStencilView);            // 描画先を設定
 	pContext_->RSSetViewports(1, &vp);
 
