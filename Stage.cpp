@@ -19,13 +19,13 @@ Stage::Stage(GameObject* parent)
 void Stage::Initialize()
 {
 	//モデルデータのロード
-	hModel_[DONUT] = Model::Load("assets/Dice.fbx");
+	hModel_[DONUT] = Model::Load("assets/Ball.fbx");
 	assert(hModel_[DONUT] >= 0);
 
-	hModel_[BALL] = Model::Load("assets/Ball.fbx");
+	hModel_[BALL] = Model::Load("assets/Dice.fbx");
 	assert(hModel_[BALL] >= 0);
 
-	transform_.scale_ = XMFLOAT3(2.0f, 2.0f, 2.0f);
+	transform_.scale_ = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	ballTrans_.scale_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
