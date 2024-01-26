@@ -22,12 +22,19 @@ void Stage::Initialize()
 	hModel_[DONUT] = Model::Load("assets/Ball.fbx");
 	assert(hModel_[DONUT] >= 0);
 
-	hModel_[BALL] = Model::Load("assets/Dice.fbx");
+	hModel_[BALL] = Model::Load("assets/Ball.fbx");
 	assert(hModel_[BALL] >= 0);
+
+	hModel_[DICE] = Model::Load("assets/Dice.fbx");
+	assert(hModel_[DICE] >= 0);
 
 	transform_.scale_ = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	ballTrans_.scale_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
+
+	boxTrans_.scale_ = XMFLOAT3(2.1f, 2.1f, 2.1f);
+
+	//ballTrans_.position_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
 	IntConstantBuffer_();
 	lightPos_.z = -1;
@@ -82,6 +89,8 @@ void Stage::Draw()
 	Model::SetTransform(hModel_[BALL], ballTrans_);
 	Model::Draw(hModel_[BALL]);
 
+	Model::SetTransform(hModel_[DICE], boxTrans_);
+	Model::Draw(hModel_[DICE]);
 }
 
 //ŠJ•ú

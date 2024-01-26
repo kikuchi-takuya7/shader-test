@@ -6,6 +6,7 @@ enum OBJ {
 	ARROW,
 	DONUT,
 	BALL,
+	DICE,
 	NUM
 };
 
@@ -45,6 +46,7 @@ private:
 	ID3D11Buffer* pCBStageScene_;
 	
 	Transform ballTrans_;
+	Transform boxTrans_;
 
 	void IntConstantBuffer_();
 	XMFLOAT4	lightSourcePosition_;

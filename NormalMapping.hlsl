@@ -55,7 +55,7 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, f
 	outData.pos = mul(pos, matWVP);
 	outData.uv = (float2)uv;
 
-
+	//法線とtan（従法線）の外積を求める？
 	float3  binormal = cross(normal, tangent);
 
 	normal.w = 0;
@@ -71,11 +71,12 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, f
 	binormal = normalize(binormal); //従法線ベクトルをローカル座標に変換したやつ
 
 	float4 posw = mul(pos, matW);
-	outData.eyev = normalize(eyePosition - posw); //ワールド座標の視線ベクトル
+	float4 eye = normalize(posw - eyePosition); //ワールド座標の視線ベクトル 先生のヒントがここを変えてたから変えたけど、特に変化なし
 
-	outData.Neyev.x = dot(outData.eyev, tangent);//接空間の視線ベクトル
-	outData.Neyev.y = dot(outData.eyev, binormal);
-	outData.Neyev.z = dot(outData.eyev, normal);
+	//接空間の視線ベクトル
+	outData.Neyev.x = dot(eye, tangent);
+	outData.Neyev.y = dot(eye, binormal);
+	outData.Neyev.z = dot(eye, normal);
 	outData.Neyev.w = 0;
 
 	float4 light = normalize(lightPosition);
@@ -84,7 +85,8 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, f
 	outData.color = mul(light, normal);
 	outData.color.w = 0.0;
 
-	outData.light.x = dot(light, tangent);//接空間の光源ベクトル
+	//接空間の光源ベクトル
+	outData.light.x = dot(light, tangent);
 	outData.light.y = dot(light, binormal);
 	outData.light.z = dot(light, normal);
 	outData.light.w = 0;
