@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/GameObject.h"
 #include "Engine/Fbx.h"
+#include "Engine/Sprite.h"
 
 enum OBJ {
 	ARROW,
@@ -48,5 +49,7 @@ private:
 
 	void IntConstantBuffer_();
 	XMFLOAT4	lightSourcePosition_;
+
+	Sprite* sprite_;
 
 };

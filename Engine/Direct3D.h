@@ -54,4 +54,7 @@ namespace Direct3D
 	//‰ð•ú
 	void Release();
 
+	void SetDepthBafferWriteEnable(bool isWrite);
+	extern SIZE screenSize;
+
 };

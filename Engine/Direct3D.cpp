@@ -25,8 +25,9 @@ namespace Direct3D
 		ID3D11InputLayout* pVertexLayout_ = nullptr;	//頂点インプットレイアウト
 		ID3D11RasterizerState* pRasterizerState_ = nullptr;	//ラスタライザー
 	};
-	SHADER_BUNDLE shader_Bandle[SHADER_MAX];
 
+	SHADER_BUNDLE shader_Bandle[SHADER_MAX];
+	SIZE screenSize;
 }
 
 
@@ -123,16 +124,19 @@ HRESULT Direct3D::Initialize(int winW, int winH, HWND hWnd)
 	pDevice_->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
 	pDevice_->CreateDepthStencilView(pDepthStencil, NULL, &pDepthStencilView);
 
+
+	//もしエフェクト毎にグラビデ的な暗い色とか、明るい色とか変えれるようにできる配列にすれば
 	//ブレンドステート
 	D3D11_BLEND_DESC blendDesc;
 	ZeroMemory(&blendDesc, sizeof(blendDesc));
 	blendDesc.AlphaToCoverageEnable = FALSE;
 	blendDesc.IndependentBlendEnable = FALSE;
-	blendDesc.RenderTarget[0].BlendEnable = TRUE;
-	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 
-	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;					//半透明使うかどうか
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;		//今描画しようとしてるもの（Srcはsourceの略）
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;//既に描画されてるもの。上のやつをBLEND_ONEにすると
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;			//上二つの色を足す。そうすることで色の合成ができる的な。上二つが指定してるのは色*0.5した物2つになってる的な
+
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
@@ -155,6 +159,8 @@ HRESULT Direct3D::Initialize(int winW, int winH, HWND hWnd)
 		MessageBox(nullptr, "シェーダーの準備に失敗しました", "エラー", MB_OK);
 		return hr;
 	}
+
+	screenSize = { winW, winH };
 
 	return S_OK;
 
@@ -568,4 +574,20 @@ void Direct3D::Release()
 	SAFE_RELEASE(pSwapChain_);
 	SAFE_RELEASE(pContext_);
 	SAFE_RELEASE(pDevice_);
+}
+
+void Direct3D::SetDepthBafferWriteEnable(bool isWrite)
+{
+	//ON
+	if (isWrite)
+	{
+		//Zバッファ（デプスステンシルを指定する）
+		pContext_->OMSetRenderTargets(1, &pRenderTargetView_, pDepthStencilView);
+	}
+
+	//OFF
+	else
+	{
+		pContext_->OMSetRenderTargets(1, &pRenderTargetView_, nullptr);
+	}
 }

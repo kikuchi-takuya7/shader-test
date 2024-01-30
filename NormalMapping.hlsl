@@ -37,9 +37,9 @@ struct VS_OUT
 	float2 uv	: TEXCOORD;		//UV座標
 	float4 eyev		:POSITION;	//ワールド座標に変換された視線ベクトル
 	float4 Neyev	:POSITION1;	//ノーマルマップ用の接空間に変換された視線ベクトル
-	float4 normal	:POSITION2; //法線ベクトル
-	float4 light	:POSITION3; //ライトを接空間に変換したベクトル
-	float4 color	:POSITION4;	//通常のランバートモデルの拡散反射の色
+	float4 normal	:NORMAL;	//法線ベクトル
+	float4 light	:POSITION2; //ライトを接空間に変換したベクトル
+	float4 color	:COLOR;		//通常のランバートモデルの拡散反射の色
 };
 
 //───────────────────────────────────────
@@ -57,6 +57,8 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, f
 
 
 	float3  binormal = cross(normal, tangent);
+	binormal = mul(binormal, matNormal);
+	binormal = normalize(binormal); //従法線ベクトルをローカル座標に変換したやつ
 
 	normal.w = 0;
 	normal = mul(normal, matNormal);
@@ -67,11 +69,10 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, f
 	tangent = mul(tangent, matNormal);
 	tangent = normalize(tangent); //接線ベクトルをローカル座標に変換したやつ
 
-	binormal = mul(binormal, matNormal);
-	binormal = normalize(binormal); //従法線ベクトルをローカル座標に変換したやつ
+	
 
 	float4 posw = mul(pos, matW);
-	outData.eyev = normalize(eyePosition - posw); //ワールド座標の視線ベクトル
+	outData.eyev = normalize(posw - eyePosition); //ワールド座標の視線ベクトル
 
 	outData.Neyev.x = dot(outData.eyev, tangent);//接空間の視線ベクトル
 	outData.Neyev.y = dot(outData.eyev, binormal);
@@ -114,11 +115,11 @@ float4 PS(VS_OUT inData) : SV_Target
 
 		float4 NL = clamp(dot(tmpNormal, inData.light), 0, 1);
 
-		float4 light = normalize(lightPosition);
+		float4 light = normalize(inData.light);
 		light = normalize(light);
 
 		float4 reflection = reflect(light, tmpNormal);
-		float4 specular = pow(saturate(dot(reflection, inData.Neyev)), 2) * specularColor;
+		float4 specular = pow(saturate(dot(reflection, normalize(inData.Neyev))), shininess) * specularColor;
 
 		if (hasTexture != 0)
 		{
@@ -150,9 +151,6 @@ float4 PS(VS_OUT inData) : SV_Target
 		}
 
 		float result = diffuse + ambient + specular;
-		if (hasTexture) {
-			result.x = inData.uv.x;
-		}
 		return result;//これのif分のとこなくせば一応色は出てくる
 	}
 }

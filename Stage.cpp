@@ -31,6 +31,10 @@ void Stage::Initialize()
 
 	IntConstantBuffer_();
 	lightPos_.z = -1;
+
+	sprite_ = new Sprite;
+
+	sprite_->Load("outUV.png");
 }
 
 //XV
@@ -81,6 +85,14 @@ void Stage::Draw()
 
 	Model::SetTransform(hModel_[BALL], ballTrans_);
 	Model::Draw(hModel_[BALL]);
+
+
+	Transform t;
+	t.position_ = { 0, 0, 0 };
+	t.scale_ = { 1.0, 1.0, 1.0 };
+	t.rotate_ = { 0,0,0 };
+	RECT rec{ 0, 0, 300, 300 };
+	sprite_->Draw(t, rec, 0.5f);
 
 }
 

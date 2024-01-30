@@ -5,6 +5,7 @@
 //#include<vector>
 #include<array>
 #include"Quad.h"
+#include "Transform.h"
 
 using namespace DirectX;
 using std::array;
@@ -53,7 +54,9 @@ public:
 	~Sprite();
 
 	HRESULT Initialize();
+	HRESULT Load(string fileName);
 	void Draw(Transform& transform);
+	void Draw(Transform& transform, RECT rect, float alpha);
 	void Release();
 
 private:
@@ -65,7 +68,7 @@ private:
 	HRESULT CreateIndexBuffer();
 
 	HRESULT CreateConstantBuffer();
-	HRESULT LoadTexture();
+	HRESULT LoadTexture(string fileName);
 
 	//ドロー関数から呼ばれる関数
 	void PassDataToCB(DirectX::XMMATRIX worldMatrix); //コンストラクトバッファ
