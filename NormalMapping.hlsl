@@ -102,7 +102,6 @@ float4 PS(VS_OUT inData) : SV_Target
 {
 
 	float4 lightSource = float4(1.0, 1.0, 1.0, 1.0);//色の4原色
-	//float4 ambentSource = float4(0.2, 0.2, 0.2, 1.0);//明るくすればツルツルする ここfloat4入れ忘れると値が全部1になって異常な程明るくなるから気をつけろよ！！！
 	float4 diffuse;
 	float4 ambient;
 
@@ -120,23 +119,23 @@ float4 PS(VS_OUT inData) : SV_Target
 		light = normalize(light);
 
 		float4 reflection = reflect(light, tmpNormal);
-		float4 specular = pow(saturate(dot(reflection, inData.Neyev)), 2) * specularColor;
+		float4 specular = pow(saturate(dot(reflection, inData.Neyev)), shininess) * specularColor;
 
 		if (hasTexture != 0)
 		{
-			diffuse = g_texture.Sample(g_sampler, inData.uv) * NL;
-			ambient = g_texture.Sample(g_sampler, inData.uv) * ambientColor;
+			diffuse = lightSource * g_texture.Sample(g_sampler, inData.uv) * NL;
+			ambient = lightSource * g_texture.Sample(g_sampler, inData.uv) * ambientColor;
 		}
 		else
 		{
-			diffuse = diffuseColor * NL;
-			ambient = diffuseColor * ambientColor;
+			diffuse = lightSource * diffuseColor * NL;
+			ambient = lightSource * diffuseColor * ambientColor;
 		}
 		return   ambient + diffuse + specular;
 	}
 	else
 	{
-		float4 reflection = reflect(normalize(-lightPosition), inData.normal);
+		float4 reflection = reflect(normalize(lightPosition), inData.normal);
 
 		float4 specular = pow(saturate(dot(reflection, normalize(inData.eyev))), shininess) * specularColor;
 		if (hasTexture == 0)

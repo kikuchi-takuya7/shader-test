@@ -37,6 +37,9 @@ void Sprite::Draw(Transform& transform)
 	transform.Calclation();//トランスフォームを計算
 	PassDataToCB(transform.GetWorldMatrix());
 	SetBufferToPipeline();
+
+	//描画
+	Direct3D::pContext_->DrawIndexed((UINT)indexNum_, (UINT)0, 0);
 }
 
 void Sprite::Release()

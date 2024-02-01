@@ -24,7 +24,7 @@ void MapController::Initialize()
 void MapController::Update()
 {
 
-    /*if (Input::IsKey(DIK_LSHIFT) && transform_.position_.y <= 10.0f) {
+    if (Input::IsKey(DIK_LSHIFT) && transform_.position_.y <= 10.0f) {
         transform_.position_.y += 0.2f;
     }
     if (Input::IsKey(DIK_LCONTROL) && transform_.position_.y >= 0.0f) {
@@ -43,7 +43,7 @@ void MapController::Update()
     }
     if (Input::IsKey(DIK_DOWNARROW) && transform_.rotate_.x >= 0) {
         transform_.rotate_.x -= 1.0f;
-    }*/
+    }
 
     //transform.rotate_.y“x‰ñ“]‚³‚¹‚és—ñ‚ğì¬
     XMMATRIX rotY = XMMatrixRotationY(XMConvertToRadians(transform_.rotate_.y));

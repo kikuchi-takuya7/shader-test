@@ -7,6 +7,7 @@ enum OBJ {
 	DONUT,
 	BALL,
 	DICE,
+	WATER,
 	NUM
 };
 
@@ -47,6 +48,9 @@ private:
 	
 	Transform ballTrans_;
 	Transform boxTrans_;
+	Transform waterTrans_;
+
+	Texture* pTexture_;
 
 	void IntConstantBuffer_();
 	XMFLOAT4	lightSourcePosition_;

@@ -354,8 +354,8 @@ void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 void Fbx::Draw(Transform& transform)
 {
 
-	//Direct3D::SetShader(SHADER_TYPE::SHADER_OUTLINE);
 	Direct3D::SetShader(SHADER_TYPE::SHADER_NORMALMAP);
+	//Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
 	transform.Calclation();//トランスフォームを計算
 
 	//一週目で輪郭用のちょっと大きい真っ黒モデルを描画して、二週目で真っ黒モデルの上からtoomのhlslを描画してる。マテリアルってのはmayaで作った一個のモデル

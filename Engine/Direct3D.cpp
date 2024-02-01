@@ -464,7 +464,7 @@ HRESULT Direct3D::InitNormalMap()
 
 	//ラスタライザ作成
 	D3D11_RASTERIZER_DESC rdc = {};
-	rdc.CullMode = D3D11_CULL_BACK; //後ろ側は描画しない処理
+	rdc.CullMode = D3D11_CULL_NONE; //後ろ側は描画しない処理
 	rdc.FillMode = D3D11_FILL_SOLID;//ワイヤーフレームだけ作るか塗るか
 	rdc.FrontCounterClockwise = FALSE; //時計回りに頂点を描画するか。FALSEだと時計回りに読み込むする
 	rdc.ScissorEnable = false;

@@ -28,13 +28,23 @@ void Stage::Initialize()
 	hModel_[DICE] = Model::Load("assets/Dice.fbx");
 	assert(hModel_[DICE] >= 0);
 
+	hModel_[WATER] = Model::Load("assets/waters.fbx");
+	assert(hModel_[WATER] >= 0);
+
 	transform_.scale_ = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	ballTrans_.scale_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
 	boxTrans_.scale_ = XMFLOAT3(2.1f, 2.1f, 2.1f);
 
+	waterTrans_.position_ = XMFLOAT3(-1.0f, -1.0f, -1.0f);
+
+	waterTrans_.scale_ = XMFLOAT3(2.0f, 2.0f, 2.0f);
 	//ballTrans_.position_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
+
+	//pTexture_ = new Texture;
+	//pTexture_->Load("Assets\\Toon.png");
+
 
 	IntConstantBuffer_();
 	lightPos_.z = -1;
@@ -76,7 +86,9 @@ void Stage::Update()
 	Direct3D::pContext_->VSSetConstantBuffers(1, 1, &pCBStageScene_);
 	Direct3D::pContext_->PSSetConstantBuffers(1, 1, &pCBStageScene_);
 
-	transform_.rotate_.y += 1;
+	//waterTrans_.rotate_.y += 1;
+	waterTrans_.rotate_.z += 1;
+	//waterTrans_.rotate_.x += 1;
 }
 
 //•`‰æ
@@ -91,11 +103,15 @@ void Stage::Draw()
 
 	Model::SetTransform(hModel_[DICE], boxTrans_);
 	Model::Draw(hModel_[DICE]);
+
+	Model::SetTransform(hModel_[WATER], waterTrans_);
+	Model::Draw(hModel_[WATER]);
 }
 
 //ŠJ•ú
 void Stage::Release()
 {
+	SAFE_DELETE(pTexture_);
 }
 
 void Stage::IntConstantBuffer_()
