@@ -57,65 +57,65 @@ void Sprite::Draw(Transform& transform)
 
 void Sprite::Draw(Transform& transform, RECT rect, float alpha)
 {
-	//いろいろ設定
-	Direct3D::SetShader(SHADER_TYPE::SHADER_2D);
-	UINT stride = sizeof(VERTEX);
-	UINT offset = 0;
-	Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
-	Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
-	Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_);
-	Direct3D::SetDepthBafferWriteEnable(false);
-	// インデックスバッファーをセット
-	stride = sizeof(int);
-	offset = 0;
-	Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_, DXGI_FORMAT_R32_UINT, 0);
+	////いろいろ設定
+	//Direct3D::SetShader(SHADER_TYPE::SHADER_2D);
+	//UINT stride = sizeof(VERTEX);
+	//UINT offset = 0;
+	//Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
+	//Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
+	//Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_);
+	//Direct3D::SetDepthBafferWriteEnable(false);
+	//// インデックスバッファーをセット
+	//stride = sizeof(int);
+	//offset = 0;
+	//Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_, DXGI_FORMAT_R32_UINT, 0);
 
-	// パラメータの受け渡し
-	D3D11_MAPPED_SUBRESOURCE pdata;
-	CONSTANT_BUFFER cb;
+	//// パラメータの受け渡し
+	//D3D11_MAPPED_SUBRESOURCE pdata;
+	//CONSTANT_BUFFER cb;
 
-	transform.Calclation();//トランスフォームを計算
+	//transform.Calclation();//トランスフォームを計算
 
-	//表示するサイズに合わせる
-	XMMATRIX cut = XMMatrixScaling((float)rect.right, (float)rect.bottom, 1);
+	////表示するサイズに合わせる
+	//XMMATRIX cut = XMMatrixScaling((float)rect.right, (float)rect.bottom, 1);
 
-	//画面に合わせる
-	XMMATRIX view = XMMatrixScaling(1.0f / Direct3D::screenSize.cx, 1.0f / Direct3D::screenSize.cy, 1.0f);
+	////画面に合わせる
+	//XMMATRIX view = XMMatrixScaling(1.0f / Direct3D::screenSize.cx, 1.0f / Direct3D::screenSize.cy, 1.0f);
 
-	//最終的な行列
-	XMMATRIX world = cut * transform.matScale_ * transform.matRotate_ * view * transform.matTranslate_;
-	cb.world = XMMatrixTranspose(world);
+	////最終的な行列
+	//XMMATRIX world = cut * transform.matScale_ * transform.matRotate_ * view * transform.matTranslate_;
+	//cb.world = XMMatrixTranspose(world);
 
-	// テクスチャ座標変換行列を渡す
-	XMMATRIX mTexTrans = XMMatrixTranslation((float)rect.left / (float)pTexture_->GetTextureSize().x,
-		(float)rect.top / (float)pTexture_->GetTextureSize().y, 0.0f);
-	XMMATRIX mTexScale = XMMatrixScaling((float)rect.right / (float)pTexture_->GetTextureSize().x,
-		(float)rect.bottom / (float)pTexture_->GetTextureSize().y, 1.0f);
-	XMMATRIX mTexel = mTexScale * mTexTrans;
-	cb.uvTrans = XMMatrixTranspose(mTexel);
+	//// テクスチャ座標変換行列を渡す
+	//XMMATRIX mTexTrans = XMMatrixTranslation((float)rect.left / (float)pTexture_->GetTextureSize().x,
+	//	(float)rect.top / (float)pTexture_->GetTextureSize().y, 0.0f);
+	//XMMATRIX mTexScale = XMMatrixScaling((float)rect.right / (float)pTexture_->GetTextureSize().x,
+	//	(float)rect.bottom / (float)pTexture_->GetTextureSize().y, 1.0f);
+	//XMMATRIX mTexel = mTexScale * mTexTrans;
+	//cb.uvTrans = XMMatrixTranspose(mTexel);
 
-	cb.color = XMFLOAT4(1, 1, 1, alpha);
+	//cb.color = XMFLOAT4(1, 1, 1, alpha);
 
-	Direct3D::pContext_->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);	// GPUからのリソースアクセスを一時止める
-	memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));		// リソースへ値を送る
+	//Direct3D::pContext_->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);	// GPUからのリソースアクセスを一時止める
+	//memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));		// リソースへ値を送る
 
 
-	ID3D11SamplerState* pSampler = pTexture_->GetSampler();
-	Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
+	//ID3D11SamplerState* pSampler = pTexture_->GetSampler();
+	//Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
 
-	ID3D11ShaderResourceView* pSRV = pTexture_->GetSRV();
-	Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
+	//ID3D11ShaderResourceView* pSRV = pTexture_->GetSRV();
+	//Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
 
-	Direct3D::pContext_->Unmap(pConstantBuffer_, 0);	// GPUからのリソースアクセスを再開
+	//Direct3D::pContext_->Unmap(pConstantBuffer_, 0);	// GPUからのリソースアクセスを再開
 
-	SetBufferToPipeline();
+	//SetBufferToPipeline();
 
-	//ポリゴンメッシュを描画する
-	Direct3D::pContext_->DrawIndexed(indexNum, 0, 0);
+	////ポリゴンメッシュを描画する
+	//Direct3D::pContext_->DrawIndexed(indexNum_, 0, 0);
 
-	Direct3D::SetShader(SHADER_TYPE::SHADER_3D);
+	//Direct3D::SetShader(SHADER_TYPE::SHADER_3D);
 
-	Direct3D::SetDepthBafferWriteEnable(true);
+	//Direct3D::SetDepthBafferWriteEnable(true);
 }
 
 void Sprite::Release()

@@ -10,11 +10,11 @@ class Texture
 {
 	ID3D11SamplerState* pSampler_;
 	ID3D11ShaderResourceView* pSRV_;
-	XMFLOAT2 imgSize_;
+	//XMFLOAT2 imgSize_;
 public:
 	Texture();
 	~Texture();
-	XMFLOAT2 GetTextureSize() { return imgSize_; }
+	//XMFLOAT2 GetTextureSize() { return imgSize_; }
 	HRESULT Load(string filename);
 	void Release();
 	ID3D11SamplerState* GetSampler() { return pSampler_; }
