@@ -43,6 +43,8 @@ namespace Direct3D
 	HRESULT InitToonShader();
 	HRESULT InitNormalMap();
 
+	void SetDepthBafferWriteEnable(bool alpha);
+
 	void SetShader(SHADER_TYPE type);
 
 	//•`‰æŠJŽn

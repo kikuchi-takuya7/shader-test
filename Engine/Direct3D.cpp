@@ -487,6 +487,22 @@ HRESULT Direct3D::InitNormalMap()
 	return S_OK;
 }
 
+void Direct3D::SetDepthBafferWriteEnable(bool alpha)
+{
+	//ON
+	if (alpha)
+	{
+		//Zバッファ（デプスステンシルを指定する）
+		pContext_->OMSetRenderTargets(1, &pRenderTargetView_, pDepthStencilView);
+	}
+
+	//OFF
+	else
+	{
+		pContext_->OMSetRenderTargets(1, &pRenderTargetView_, nullptr);
+	}
+}
+
 void Direct3D::SetShader(SHADER_TYPE type)
 {
 	//それぞれのデバイスコンテキストにセット

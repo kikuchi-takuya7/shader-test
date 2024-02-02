@@ -353,73 +353,81 @@ void Fbx::InitTexture(fbxsdk::FbxSurfaceMaterial* pMaterial, const DWORD& i)
 //memo アウトライン読んでTOON呼ぶ順番でなんか呼ぶ（？）　あとはメモに入れた
 void Fbx::Draw(Transform& transform)
 {
+	
+	//Direct3D::pContext_->OMSetRenderTargets(1, &pRenderTargetView_, pDepthStencilView);
+	
+	
 
-	Direct3D::SetShader(SHADER_TYPE::SHADER_NORMALMAP);
 	//Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
 	transform.Calclation();//トランスフォームを計算
 
 	//一週目で輪郭用のちょっと大きい真っ黒モデルを描画して、二週目で真っ黒モデルの上からtoomのhlslを描画してる。マテリアルってのはmayaで作った一個のモデル
 	//for (int f = 0; f < 2; f++) {
 
-		for (int i = 0; i < materialCount_; i++) {
+	for (int i = 0; i < materialCount_; i++) {
 
-			//コンスタントバッファに情報を渡す
-			CONSTANT_BUFFER cb;
-			cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
-			cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
-			cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
+		//コンスタントバッファに情報を渡す
+		CONSTANT_BUFFER cb;
+		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
+		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
+		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
+		Direct3D::SetShader(SHADER_TYPE::SHADER_NORMALMAP);
+		Direct3D::SetDepthBafferWriteEnable(false);
 
-			//各光の情報を入れる
-			cb.diffuseColor = pMaterialList_[i].diffuse;
-			cb.ambientColor = pMaterialList_[i].ambient;
-			cb.specularColor = pMaterialList_[i].specular;
-			cb.shininess = pMaterialList_[i].shininess;
+		//各光の情報を入れる
+		cb.diffuseColor = pMaterialList_[i].diffuse;
+		cb.ambientColor = pMaterialList_[i].ambient;
+		cb.specularColor = pMaterialList_[i].specular;
+		cb.shininess = pMaterialList_[i].shininess;
 
-			cb.hasTexture = pMaterialList_[i].pTexture != nullptr;
-			cb.hasNormalMap = pMaterialList_[i].pNormalMap != nullptr;
+		cb.hasTexture = pMaterialList_[i].pTexture != nullptr;
+		cb.hasNormalMap = pMaterialList_[i].pNormalMap != nullptr;
 
-			Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
+		Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
 
-			//頂点バッファ
-			UINT stride = sizeof(VERTEX);
-			UINT offset = 0;
-			Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
+		//頂点バッファ
+		UINT stride = sizeof(VERTEX);
+		UINT offset = 0;
+		Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
 
-			// インデックスバッファーをセット
-			stride = sizeof(int);
-			offset = 0;
-			Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
+		// インデックスバッファーをセット
+		stride = sizeof(int);
+		offset = 0;
+		Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
 
-			Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_); //頂点シェーダー用
-			Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_); //ピクセルシェーダー用
+		Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_); //頂点シェーダー用
+		Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_); //ピクセルシェーダー用
 
-			if (pMaterialList_[i].pTexture)
-			{
-				ID3D11SamplerState* pSampler = pMaterialList_[i].pTexture->GetSampler();
-				Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
-				ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
-				Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
-			}
-
-			if (pMaterialList_[i].pNormalMap) {
-				
-				ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
-				Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRV);
-			}
-
-			//ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
-			//Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);//(hlslでレジスターがt1だから)
-
-			Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
-
+		if (pMaterialList_[i].pTexture)
+		{
+			ID3D11SamplerState* pSampler = pMaterialList_[i].pTexture->GetSampler();
+			Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
+			ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
+			Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
 		}
 
-		//2週目でtoonシェーダーになるように
-		//Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
-		//transform.Calclation();
+		if (pMaterialList_[i].pNormalMap) {
+				
+			ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
+			Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRV);
+		}
 
-	//}
+		//ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
+		//Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);//(hlslでレジスターがt1だから)
 
+		
+		Direct3D::SetDepthBafferWriteEnable(true);
+		Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
+		
+	}
+
+	//2週目でtoonシェーダーになるように
+	//Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
+	//transform.Calclation();
+
+//}
+
+	
 	
 }
 
