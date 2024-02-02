@@ -87,7 +87,7 @@ void Stage::Update()
 	Direct3D::pContext_->PSSetConstantBuffers(1, 1, &pCBStageScene_);
 
 	//waterTrans_.rotate_.y += 1;
-	waterTrans_.rotate_.z += 1;
+	//waterTrans_.rotate_.z += 1;
 	//waterTrans_.rotate_.x += 1;
 }
 
@@ -105,7 +105,7 @@ void Stage::Draw()
 	Model::Draw(hModel_[DICE]);
 
 	Model::SetTransform(hModel_[WATER], waterTrans_);
-	Model::Draw(hModel_[WATER]);
+	//Model::Draw(hModel_[WATER]);
 }
 
 //ŠJ•ú

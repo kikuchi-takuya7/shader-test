@@ -124,6 +124,7 @@ HRESULT Direct3D::Initialize(int winW, int winH, HWND hWnd)
 	//データを画面に描画するための一通りの設定（パイプライン）
 	pContext_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);  // データの入力種類を指定
 	pContext_->OMSetRenderTargets(1, &pRenderTargetView_, pDepthStencilView);            // 描画先を設定
+	//pContext_->OMSetRenderTargets(1, &pRenderTargetView_, nullptr);            // 描画先を設定
 	pContext_->RSSetViewports(1, &vp);
 
 	//シェーダー準備
@@ -464,7 +465,7 @@ HRESULT Direct3D::InitNormalMap()
 
 	//ラスタライザ作成
 	D3D11_RASTERIZER_DESC rdc = {};
-	rdc.CullMode = D3D11_CULL_NONE; //後ろ側は描画しない処理
+	rdc.CullMode = D3D11_CULL_BACK; //後ろ側は描画しない処理
 	rdc.FillMode = D3D11_FILL_SOLID;//ワイヤーフレームだけ作るか塗るか
 	rdc.FrontCounterClockwise = FALSE; //時計回りに頂点を描画するか。FALSEだと時計回りに読み込むする
 	rdc.ScissorEnable = false;
