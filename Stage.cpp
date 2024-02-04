@@ -33,6 +33,8 @@ void Stage::Initialize()
 
 	transform_.scale_ = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
+	transform_.position_.z += 2.0f;
+
 	ballTrans_.scale_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
 	boxTrans_.scale_ = XMFLOAT3(2.1f, 2.1f, 2.1f);

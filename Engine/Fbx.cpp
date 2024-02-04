@@ -372,7 +372,6 @@ void Fbx::Draw(Transform& transform)
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
 		Direct3D::SetShader(SHADER_TYPE::SHADER_NORMALMAP);
-		Direct3D::SetDepthBafferWriteEnable(false);
 
 		//各光の情報を入れる
 		cb.diffuseColor = pMaterialList_[i].diffuse;
@@ -416,7 +415,7 @@ void Fbx::Draw(Transform& transform)
 		//Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);//(hlslでレジスターがt1だから)
 
 		
-		Direct3D::SetDepthBafferWriteEnable(true);
+
 		Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
 		
 	}
