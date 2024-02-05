@@ -132,7 +132,7 @@ HRESULT Direct3D::Initialize(int winW, int winH, HWND hWnd)
 
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;					//半透明使うかどうか
 	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;		//今描画しようとしてるもの（Srcはsourceの略）
-	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;//既に描画されてるもの。上のやつをBLEND_ONEにすると
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;		//既に描画されてるもの。上のやつをBLEND_ONEにすると完全に不透明になったりする
 	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;			//上二つの色を足す。そうすることで色の合成ができる的な。上二つが指定してるのは色*0.5した物2つになってる的な
 
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
