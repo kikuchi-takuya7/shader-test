@@ -358,7 +358,8 @@ void Fbx::Draw(Transform& transform)
 	
 	
 
-	//Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
+	Direct3D::SetShader(SHADER_TYPE::SHADER_NORMALMAP);
+	//Direct3D::SetShader(SHADER_TYPE::SHADER_3D);
 	transform.Calclation();//トランスフォームを計算
 
 	//一週目で輪郭用のちょっと大きい真っ黒モデルを描画して、二週目で真っ黒モデルの上からtoomのhlslを描画してる。マテリアルってのはmayaで作った一個のモデル
@@ -371,7 +372,7 @@ void Fbx::Draw(Transform& transform)
 		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
-		Direct3D::SetShader(SHADER_TYPE::SHADER_NORMALMAP);
+		
 
 		//各光の情報を入れる
 		cb.diffuseColor = pMaterialList_[i].diffuse;
