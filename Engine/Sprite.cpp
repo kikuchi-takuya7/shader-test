@@ -32,7 +32,14 @@ HRESULT Sprite::Initialize()
 
 void Sprite::Draw(Transform& transform)
 {
+
+	
+
 	Direct3D::SetShader(SHADER_2D);
+	UINT stride = sizeof(VERTEX);
+	UINT offset = 0;
+
+	//いろいろセットしてた。スクショ見て
 
 	transform.Calclation();//トランスフォームを計算
 	PassDataToCB(transform.GetWorldMatrix());

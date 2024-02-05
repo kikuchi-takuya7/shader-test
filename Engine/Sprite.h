@@ -20,7 +20,9 @@ class Sprite
 {
 	struct CONSTANT_BUFFER
 	{
+		//æ¶‚±‚±‚É‚¢‚ë‚ñ‚Èî•ñ‚ ‚Á‚½B‚±‚±‚©
 		XMMATRIX	matNormal;
+		float scroll;
 	};
 
 	//’¸“_î•ñ
