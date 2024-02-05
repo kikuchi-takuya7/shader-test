@@ -107,7 +107,7 @@ void Stage::Draw()
 	Model::Draw(hModel_[DICE]);
 
 	Model::SetTransform(hModel_[WATER], waterTrans_);
-	Model::Draw(hModel_[WATER]);
+	//Model::Draw(hModel_[WATER]);
 }
 
 //ŠJ•ú
