@@ -5,7 +5,9 @@ XMFLOAT4 LIGHT_DERECTION = { 1,5,0,1 };
 
 #pragma warning(disable:4099)
 
-Fbx::Fbx(): pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr), pMaterialList_(nullptr), vertexCount_(0),polygonCount_(0),materialCount_(0)
+Fbx::Fbx(): pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr), pMaterialList_(nullptr),
+			vertexCount_(0),polygonCount_(0),materialCount_(0),
+			scrollVal_(0)
 {
 }
 
@@ -257,7 +259,7 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 		pMaterialList_[i].diffuse = XMFLOAT4((float)diffuse[0], (float)diffuse[1], (float)diffuse[2], 1.0f); //ここでシンプル３D用のディヒューズを入れる
 		pMaterialList_[i].ambient = XMFLOAT4((float)ambient[0], (float)ambient[1], (float)ambient[2], 1.0f);
 		pMaterialList_[i].specular = XMFLOAT4(0, 0, 0, 0);
-		pMaterialList_[i].shininess = 1;
+		pMaterialList_[i].shininess = 2;
 
 		//マヤで指定したマテリアルの種類のIDが同じなら（FbxSurfacePhongっていうmayaで設定したキラキラしたマテリアルなら）
 		if (pMaterial->GetClassId().Is(FbxSurfacePhong::ClassId)) {
@@ -359,7 +361,9 @@ void Fbx::Draw(Transform& transform)
 	
 
 	Direct3D::SetShader(SHADER_TYPE::SHADER_NORMALMAP);
+	//Direct3D::SetShader(SHADER_TYPE::SHADER_2D);
 	//Direct3D::SetShader(SHADER_TYPE::SHADER_3D);
+	//Direct3D::SetShader(SHADER_TYPE::SHADER_TOON);
 	transform.Calclation();//トランスフォームを計算
 
 	//一週目で輪郭用のちょっと大きい真っ黒モデルを描画して、二週目で真っ黒モデルの上からtoomのhlslを描画してる。マテリアルってのはmayaで作った一個のモデル

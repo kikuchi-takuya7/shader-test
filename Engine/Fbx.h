@@ -79,4 +79,6 @@ public:
 	void Draw(Transform& transform);
 	void Release();
 	void SetLightSource(XMFLOAT4 pos) { lightSourcePosition_ = pos; }
+
+	float scrollVal_;
 };

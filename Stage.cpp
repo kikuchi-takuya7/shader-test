@@ -41,11 +41,16 @@ void Stage::Initialize()
 
 	waterTrans_.position_ = XMFLOAT3(-1.0f, -1.0f, -1.0f);
 
-	waterTrans_.scale_ = XMFLOAT3(2.0f, 2.0f, 2.0f);
+	waterTrans_.scale_ = XMFLOAT3(1.5f, 1.5f, 1.5f);
+
+	spriteTrans_.scale_ = XMFLOAT3(0.5f, 0.5f, 0.5f);
 	//ballTrans_.position_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
 	//pTexture_ = new Texture;
 	//pTexture_->Load("Assets\\Toon.png");
+
+	pSprite_ = new Sprite;
+	pSprite_->Initialize();
 
 
 	IntConstantBuffer_();
@@ -98,21 +103,25 @@ void Stage::Draw()
 {
 	
 	Model::SetTransform(hModel_[DONUT], transform_);
-	Model::Draw(hModel_[DONUT]);
+	//Model::Draw(hModel_[DONUT]);
 
 	Model::SetTransform(hModel_[BALL], ballTrans_);
 	Model::Draw(hModel_[BALL]);
 
 	Model::SetTransform(hModel_[DICE], boxTrans_);
-	Model::Draw(hModel_[DICE]);
+	//Model::Draw(hModel_[DICE]);
 
 	Model::SetTransform(hModel_[WATER], waterTrans_);
-	//Model::Draw(hModel_[WATER]);
+	Model::Draw(hModel_[WATER]);
+
+	//pSprite_->Draw(waterTrans_);
 }
 
 //ŠJ•ú
 void Stage::Release()
 {
+	SAFE_RELEASE(pSprite_);
+	SAFE_DELETE(pSprite_);
 	SAFE_DELETE(pTexture_);
 }
 

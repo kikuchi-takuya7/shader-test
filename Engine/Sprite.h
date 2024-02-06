@@ -22,6 +22,8 @@ class Sprite
 	{
 		//先生ここにいろんな情報あった。ここか
 		XMMATRIX	matNormal;
+		//XMMATRIX	uvTrans;
+		XMFLOAT4	color;
 		float scroll;
 	};
 
@@ -57,6 +59,9 @@ public:
 	HRESULT Initialize();
 	void Draw(Transform& transform);
 	void Release();
+	HRESULT LoadTexture();
+
+	float scrollVal_;
 
 private:
 	//イニシャライズから呼ばれる関数
@@ -67,7 +72,7 @@ private:
 	HRESULT CreateIndexBuffer();
 
 	HRESULT CreateConstantBuffer();
-	HRESULT LoadTexture();
+	
 
 	//ドロー関数から呼ばれる関数
 	void PassDataToCB(DirectX::XMMATRIX worldMatrix); //コンストラクトバッファ

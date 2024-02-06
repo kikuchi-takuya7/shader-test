@@ -20,6 +20,7 @@ cbuffer global:register(b0)
 	float		shininess;			//ハイライトの広がりの大きさ
 	int			hasTexture;			//テクスチャーが貼られているかどうか
 	int			hasNormalMap;		//ノーマルマップがあるかどうか
+	float		g_scroll;	//スクロール量の変数
 };
 
 cbuffer gmodel:register(b1) {
@@ -53,7 +54,7 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD, float4 normal : NORMAL, f
 	//ローカル座標に、ワールド・ビュー・プロジェクション行列をかけて
 	//スクリーン座標に変換し、ピクセルシェーダーへ
 	outData.pos = mul(pos, matWVP);
-	outData.uv = (float2)uv;
+	outData.uv = uv;
 
 	//法線とtan（従法線）の外積を求める？
 	float3  binormal = cross(normal, tangent);
@@ -105,11 +106,14 @@ float4 PS(VS_OUT inData) : SV_Target
 	float4 diffuse;
 	float4 ambient;
 
+	float2 tmpUV = inData.uv;
+	tmpUV.x += g_scroll;
+
 	if (hasNormalMap)
 	{
 		//inData.light = normalize(inData.light);
 
-		float4 tmpNormal = normalTex.Sample(g_sampler, inData.uv) * 2.0f - 1.0f;
+		float4 tmpNormal = normalTex.Sample(g_sampler, tmpUV) * 2.0f - 1.0f;
 		tmpNormal.w = 0;
 		tmpNormal = normalize(tmpNormal);
 
@@ -123,8 +127,8 @@ float4 PS(VS_OUT inData) : SV_Target
 
 		if (hasTexture != 0)
 		{
-			diffuse = lightSource * g_texture.Sample(g_sampler, inData.uv) * NL;
-			ambient = lightSource * g_texture.Sample(g_sampler, inData.uv) * ambientColor;
+			diffuse = lightSource * g_texture.Sample(g_sampler, tmpUV) * NL;
+			ambient = lightSource * g_texture.Sample(g_sampler, tmpUV) * ambientColor;
 		}
 		else
 		{
@@ -145,8 +149,8 @@ float4 PS(VS_OUT inData) : SV_Target
 		}
 		else
 		{
-			diffuse = lightSource * g_texture.Sample(g_sampler, inData.uv) * inData.color;
-			ambient = lightSource * g_texture.Sample(g_sampler, inData.uv) * ambientColor;
+			diffuse = lightSource * g_texture.Sample(g_sampler, tmpUV) * inData.color;
+			ambient = lightSource * g_texture.Sample(g_sampler, tmpUV) * ambientColor;
 		}
 		return ambient + diffuse + specular;
 	}

@@ -8,13 +8,24 @@ SamplerState	g_sampler : register(s0);	//サンプラー
 // コンスタントバッファ
 // DirectX 側から送信されてくる、ポリゴン頂点以外の諸情報の定義
 //───────────────────────────────────────
-cbuffer global
+cbuffer global:register(b0)
 {
 	float4x4	matWVP;			// ワールド・ビュー・プロジェクションの合成行列
-	float4x4	matNormal;           // ワールド行列
-	float4		diffuseColor;		// ディフューズカラー（マテリアルの色）
-	bool		isTexture;		// テクスチャ貼ってあるかどうか
+	float4x4	matW;           // ワールド行列
+	float4x4	matNormal;           //ノーマルのローカルへの変換行列から平行移動成分をとったやつ
+	float4		diffuseColor;		//マテリアルの色＝拡散反射係数
+	float4		ambientColor;		//環境光
+	float4		specularColor;		//鏡面反射＝ハイライトの係数
+	float		shininess;			//ハイライトの広がりの大きさ
+	int			hasTexture;			//テクスチャーが貼られているかどうか
+	int			hasNormalMap;		//ノーマルマップがあるかどうか
 };
+
+cbuffer gmodel:register(b1) {
+
+	float4		lightPosition;		//っ高原の位置
+	float4		eyePosition;		//支店位置＝カメラの位置
+}
 
 //───────────────────────────────────────
 // 頂点シェーダー出力＆ピクセルシェーダー入力データ構造体
@@ -60,7 +71,7 @@ float4 PS(VS_OUT inData) : SV_Target
 	float4 diffuse;
 	float4 ambient;
 
-	if (isTexture) {
+	if (hasTexture) {
 		diffuse = lightSource * g_texture.Sample(g_sampler, inData.uv) * inData.color;//拡散反射色
 		ambient = lightSource * g_texture.Sample(g_sampler, inData.uv) * ambentSource;//環境反射色
 	}

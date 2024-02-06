@@ -11,6 +11,8 @@ SamplerState	g_sampler : register(s0);	//サンプラー
 cbuffer global
 {
 	float4x4	matNormal;	//ワールド行列
+	float4	g_vecColor;
+	float		g_scroll;	//スクロール量の変数
 };
 
 //───────────────────────────────────────
@@ -18,7 +20,7 @@ cbuffer global
 //───────────────────────────────────────
 struct VS_OUT
 {
-	float4 pos    : SV_POSITION;	//位置
+	float4 pos  : SV_POSITION;	//位置
 	float2 uv	: TEXCOORD;			//UV座標
 };
 
@@ -49,9 +51,9 @@ float4 PS(VS_OUT inData) : SV_Target
 
 	float4 output;
 	float2 tmpuv = inData.uv;
-	tmpuv.x += g_scroll;
-	output = g_vecColor * g_texture.Sample(g_sampler, inData.uv);
-	
+	tmpuv.x = tmpuv.x + g_scroll;
+	//output = g_vecColor * g_texture.Sample(g_sampler, tmpuv);
+	output = g_texture.Sample(g_sampler, tmpuv);
 	return  output;
 }
 

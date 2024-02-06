@@ -40,9 +40,9 @@ HRESULT Texture::Load(string filename)
 
 	SamDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;//LINEARだと大きくしたときにぼかされる。POINTだとボケないようになるらしい
 	
-	SamDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;//WRAPにするとテクスチャがそのモデルの大きさから余った分だけループするようになる（？）
-	SamDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;//MIRRORにすると裏表表裏みたいな感じでループする。WRAPと違って境目(テクスチャ的な境目)が出ないから草原とか自然物に有効
-	SamDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;//もとからループしてる画像ならWRAPでよし
+	SamDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;//WRAPにするとテクスチャがそのモデルの大きさから余った分だけループするようになる（？）
+	SamDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;//MIRRORにすると裏表表裏みたいな感じでループする。WRAPと違って境目(テクスチャ的な境目)が出ないから草原とか自然物に有効
+	SamDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;//もとからループしてる画像ならWRAPでよし
 
 	hr = Direct3D::pDevice_->CreateSamplerState(&SamDesc, &pSampler_);
 	if (FAILED(hr)) {

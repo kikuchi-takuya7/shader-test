@@ -2,7 +2,7 @@
 
 Sprite::Sprite() :
 	vertexNum_(0), vertices_{}, indexNum_(0), index_(0),
-	pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr), pTexture_(nullptr)
+	pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr), pTexture_(nullptr),scrollVal_(0)
 {
 	//index_ = { 0, 2, 3, 0, 1, 2 };
 	indexNum_ = 6;
@@ -32,8 +32,7 @@ HRESULT Sprite::Initialize()
 
 void Sprite::Draw(Transform& transform)
 {
-
-	
+	scrollVal_ += 0.001f;
 
 	Direct3D::SetShader(SHADER_2D);
 	UINT stride = sizeof(VERTEX);
@@ -157,7 +156,7 @@ HRESULT Sprite::LoadTexture()
 {
 	pTexture_ = new Texture;
 	HRESULT hr;
-	hr = pTexture_->Load("Assets\\Dice.png");
+	hr = pTexture_->Load("Assets\\WaterColor.png");
 	if (FAILED(hr)) {
 		MessageBox(nullptr, "ファイルのロードに失敗しました", "エラー", MB_OK);
 		return hr;
@@ -170,7 +169,9 @@ void Sprite::PassDataToCB(DirectX::XMMATRIX worldMatrix)
 	//コンスタントバッファに渡す情報
 	D3D11_MAPPED_SUBRESOURCE pdata;
 	CONSTANT_BUFFER cb;
-	cb.matNormal = XMMatrixTranspose(worldMatrix);	//ワールド行列を渡す
+	cb.matNormal = XMMatrixTranspose(worldMatrix);	//ワールド行列を渡す.転置して返してるらしい。なにそれ
+	cb.scroll = scrollVal_;
+	cb.color = XMFLOAT4(1, 1, 1, 1);
 	Direct3D::pContext_->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);	// GPUからのデータアクセスを止める
 	memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));	// データを値を送る
 
