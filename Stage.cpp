@@ -104,10 +104,10 @@ void Stage::Draw()
 	Model::Draw(hModel_[BALL]);
 
 	Model::SetTransform(hModel_[DICE], boxTrans_);
-	Model::Draw(hModel_[DICE]);
+	//Model::Draw(hModel_[DICE]);
 
 	Model::SetTransform(hModel_[WATER], waterTrans_);
-	//Model::Draw(hModel_[WATER]);
+	Model::Draw(hModel_[WATER]);
 }
 
 //ŠJ•ú
