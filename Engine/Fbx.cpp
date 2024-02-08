@@ -71,8 +71,8 @@ HRESULT Fbx::Load(std::string fileName)
 	//マネージャ解放
 	pFbxManager->Destroy();
 
-	pToonTex_ = new Texture;
-	pToonTex_->Load("Assets\\Toon.png");//画像はまだ適当
+	//pToonTex_ = new Texture;
+	//pToonTex_->Load("Assets\\Toon.png");//画像はまだ適当
 
 	return S_OK;
 }
@@ -437,7 +437,7 @@ void Fbx::Release()
 	//SAFE_RELEASE(pTexture_);
 	//SAFE_DELETE(pTexture_);
 
-	SAFE_DELETE(pToonTex_);
+	//SAFE_DELETE(pToonTex_);
 	SAFE_RELEASE(pConstantBuffer_);
 	//SAFE_RELEASE(pIndexBuffer_);
 	SAFE_DELETE(pIndexBuffer_);
