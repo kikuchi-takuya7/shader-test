@@ -107,7 +107,7 @@ float4 PS(VS_OUT inData) : SV_Target
 	float4 ambient;
 
 	float2 tmpUV = inData.uv;
-	tmpUV.x += g_scroll;
+	//tmpUV.x += g_scroll;
 
 	if (hasNormalMap)
 	{

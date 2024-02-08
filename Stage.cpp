@@ -103,7 +103,7 @@ void Stage::Draw()
 {
 	
 	Model::SetTransform(hModel_[DONUT], transform_);
-	//Model::Draw(hModel_[DONUT]);
+	Model::Draw(hModel_[DONUT]);
 
 	Model::SetTransform(hModel_[BALL], ballTrans_);
 	Model::Draw(hModel_[BALL]);
@@ -112,7 +112,7 @@ void Stage::Draw()
 	//Model::Draw(hModel_[DICE]);
 
 	Model::SetTransform(hModel_[WATER], waterTrans_);
-	Model::Draw(hModel_[WATER]);
+	//Model::Draw(hModel_[WATER]);
 
 	//pSprite_->Draw(waterTrans_);
 }
