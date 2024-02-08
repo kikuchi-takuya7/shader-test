@@ -107,7 +107,7 @@ float4 PS(VS_OUT inData) : SV_Target
 	float4 ambient;
 
 	float2 tmpUV = inData.uv;
-	//tmpUV.x += g_scroll;
+	tmpUV.x += g_scroll;
 
 	if (hasNormalMap)
 	{
@@ -135,7 +135,12 @@ float4 PS(VS_OUT inData) : SV_Target
 			diffuse = lightSource * diffuseColor * NL;
 			ambient = lightSource * diffuseColor * ambientColor;
 		}
-		return   ambient + diffuse + specular;
+
+		float4 result = ambient + diffuse + specular;
+		//return result;
+		result.a = (result.r + result.g + result.b) % 3 + 0.3f;
+		//result.a = 0.5;
+		return result;
 	}
 	else
 	{

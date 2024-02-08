@@ -39,7 +39,7 @@ class Fbx
 		FLOAT		shininess;		//ハイライトの強さ（MayaのCosinePower）
 		BOOL		hasTexture;		// テクスチャ貼ってあるかどうか
 		BOOL		hasNormalMap;
-		
+		float scroll;
 	};
 
 	//頂点インプットレイアウトの時にこの情報を使う
@@ -55,6 +55,8 @@ class Fbx
 	int vertexCount_;	//頂点数
 	int polygonCount_;	//ポリゴン数
 	int materialCount_;	//マテリアルの個数
+
+	//float scrollVal_;
 
 	ID3D11Buffer* pVertexBuffer_;
 	ID3D11Buffer** pIndexBuffer_;

@@ -28,7 +28,7 @@ void Stage::Initialize()
 	hModel_[DICE] = Model::Load("assets/Dice.fbx");
 	assert(hModel_[DICE] >= 0);
 
-	hModel_[WATER] = Model::Load("assets/waters.fbx");
+	hModel_[WATER] = Model::Load("assets/waternew.fbx");
 	assert(hModel_[WATER] >= 0);
 
 	transform_.scale_ = XMFLOAT3(1.0f, 1.0f, 1.0f);
@@ -44,7 +44,6 @@ void Stage::Initialize()
 	waterTrans_.scale_ = XMFLOAT3(1.5f, 1.5f, 1.5f);
 
 	spriteTrans_.scale_ = XMFLOAT3(0.5f, 0.5f, 0.5f);
-	//ballTrans_.position_ = XMFLOAT3(0.1f, 0.1f, 0.1f);
 
 	//pTexture_ = new Texture;
 	//pTexture_->Load("Assets\\Toon.png");
@@ -54,7 +53,8 @@ void Stage::Initialize()
 
 
 	IntConstantBuffer_();
-	lightPos_.z = -1;
+	lightPos_.z = -5;
+	lightPos_.y = 5;
 }
 
 //XV
@@ -103,7 +103,7 @@ void Stage::Draw()
 {
 	
 	Model::SetTransform(hModel_[DONUT], transform_);
-	Model::Draw(hModel_[DONUT]);
+	//Model::Draw(hModel_[DONUT]);
 
 	Model::SetTransform(hModel_[BALL], ballTrans_);
 	Model::Draw(hModel_[BALL]);
@@ -112,7 +112,7 @@ void Stage::Draw()
 	//Model::Draw(hModel_[DICE]);
 
 	Model::SetTransform(hModel_[WATER], waterTrans_);
-	//Model::Draw(hModel_[WATER]);
+	Model::Draw(hModel_[WATER]);
 
 	//pSprite_->Draw(waterTrans_);
 }

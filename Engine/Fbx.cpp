@@ -73,8 +73,8 @@ HRESULT Fbx::Load(std::string fileName)
 	//マネージャ解放
 	pFbxManager->Destroy();
 
-	pToonTex_ = new Texture;
-	pToonTex_->Load("Assets\\Toon.png");//画像はまだ適当
+	//pToonTex_ = new Texture;
+	//pToonTex_->Load("Assets\\Toon.png");//画像はまだ適当
 
 	return S_OK;
 }
@@ -369,6 +369,8 @@ void Fbx::Draw(Transform& transform)
 	//一週目で輪郭用のちょっと大きい真っ黒モデルを描画して、二週目で真っ黒モデルの上からtoomのhlslを描画してる。マテリアルってのはmayaで作った一個のモデル
 	//for (int f = 0; f < 2; f++) {
 
+	scrollVal_ += 0.001f;
+
 	for (int i = 0; i < materialCount_; i++) {
 
 		//コンスタントバッファに情報を渡す
@@ -386,6 +388,8 @@ void Fbx::Draw(Transform& transform)
 
 		cb.hasTexture = pMaterialList_[i].pTexture != nullptr;
 		cb.hasNormalMap = pMaterialList_[i].pNormalMap != nullptr;
+
+		cb.scroll = scrollVal_;
 
 		Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
 
@@ -441,7 +445,7 @@ void Fbx::Release()
 	//SAFE_RELEASE(pTexture_);
 	//SAFE_DELETE(pTexture_);
 
-	SAFE_DELETE(pToonTex_);
+	//SAFE_DELETE(pToonTex_);
 	SAFE_RELEASE(pConstantBuffer_);
 	//SAFE_RELEASE(pIndexBuffer_);
 	SAFE_DELETE(pIndexBuffer_);
