@@ -137,6 +137,10 @@ float4 PS(VS_OUT inData) : SV_Target
 			ambient = lightSource * diffuseColor * ambientColor;
 		}
 
+		//ambient.x = ambient.x * 1.3;
+		//ambient.y = ambient.y * 1.3;
+		//ambient.z = ambient.z * 1.3;
+
 		float4 result = ambient + diffuse + specular;
 		//return result;
 		result.a = (result.r + result.g + result.b) % 3 + 0.3f;
