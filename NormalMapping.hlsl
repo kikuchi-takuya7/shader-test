@@ -21,6 +21,7 @@ cbuffer global:register(b0)
 	int			hasTexture;			//テクスチャーが貼られているかどうか
 	int			hasNormalMap;		//ノーマルマップがあるかどうか
 	float		g_scroll;	//スクロール量の変数
+	float		alpha;		//透明度
 };
 
 cbuffer gmodel:register(b1) {
@@ -139,7 +140,7 @@ float4 PS(VS_OUT inData) : SV_Target
 		float4 result = ambient + diffuse + specular;
 		//return result;
 		result.a = (result.r + result.g + result.b) % 3 + 0.3f;
-		//result.a = 0.5;
+		result.a = result.a * alpha;
 		return result;
 	}
 	else

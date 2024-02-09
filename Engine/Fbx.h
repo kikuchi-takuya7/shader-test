@@ -39,7 +39,8 @@ class Fbx
 		FLOAT		shininess;		//ハイライトの強さ（MayaのCosinePower）
 		BOOL		hasTexture;		// テクスチャ貼ってあるかどうか
 		BOOL		hasNormalMap;
-		float scroll;
+		float scroll;	//海面移動
+		float alpha;	//透明度
 	};
 
 	//頂点インプットレイアウトの時にこの情報を使う

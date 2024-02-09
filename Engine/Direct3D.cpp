@@ -482,7 +482,7 @@ HRESULT Direct3D::InitNormalMap()
 		MessageBox(nullptr, "ピクセルシェーダの作成に失敗しました", "エラー", MB_OK);
 		return hr;
 	}
-
+	
 
 	SAFE_RELEASE(pCompilePS);
 

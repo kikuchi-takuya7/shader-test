@@ -371,6 +371,70 @@ void Fbx::Draw(Transform& transform)
 
 	scrollVal_ += 0.001f;
 
+	
+
+	//海面を作る
+	for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < materialCount_; i++) {
+
+			//コンスタントバッファに情報を渡す
+			CONSTANT_BUFFER cb;
+			cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
+			cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
+			cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
+
+
+			//各光の情報を入れる
+			cb.diffuseColor = pMaterialList_[i].diffuse;
+			cb.ambientColor = pMaterialList_[i].ambient;
+			cb.specularColor = pMaterialList_[i].specular;
+			cb.shininess = pMaterialList_[i].shininess;
+
+			cb.hasTexture = false;
+			cb.hasNormalMap = pMaterialList_[i].pNormalMap != nullptr;
+			
+			if (i == 0) {
+				cb.scroll = -scrollVal_;
+			} else {
+				cb.scroll = scrollVal_;
+			}
+
+			cb.alpha = 0.2f;
+			
+
+			Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
+
+			//頂点バッファ
+			UINT stride = sizeof(VERTEX);
+			UINT offset = 0;
+			Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
+
+			// インデックスバッファーをセット
+			stride = sizeof(int);
+			offset = 0;
+			Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
+
+			Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_); //頂点シェーダー用
+			Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_); //ピクセルシェーダー用
+
+			if (pMaterialList_[i].pNormalMap) {
+
+				ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
+				Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRV);
+			}
+
+			//ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
+			//Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);//(hlslでレジスターがt1だから)
+
+
+
+			Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
+
+		}
+	}
+	
+
+	//海面の下の動かない海を表す
 	for (int i = 0; i < materialCount_; i++) {
 
 		//コンスタントバッファに情報を渡す
@@ -378,7 +442,7 @@ void Fbx::Draw(Transform& transform)
 		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
 		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
-		
+
 
 		//各光の情報を入れる
 		cb.diffuseColor = pMaterialList_[i].diffuse;
@@ -389,7 +453,9 @@ void Fbx::Draw(Transform& transform)
 		cb.hasTexture = pMaterialList_[i].pTexture != nullptr;
 		cb.hasNormalMap = pMaterialList_[i].pNormalMap != nullptr;
 
-		cb.scroll = scrollVal_;
+		cb.scroll = 0.0f;
+
+		cb.alpha = 1.0f;
 
 		Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
 
@@ -415,57 +481,6 @@ void Fbx::Draw(Transform& transform)
 		}
 
 		if (pMaterialList_[i].pNormalMap) {
-				
-			ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
-			Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRV);
-		}
-
-		//ID3D11ShaderResourceView* pSRVToon = pToonTex_->GetSRV();
-		//Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRVToon);//(hlslでレジスターがt1だから)
-
-		
-
-		Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
-		
-	}
-
-	//二週目でノーマルマップだけ反転させればいけるかなとか思ったけど、そんなわけがなく
-	for (int i = 0; i < materialCount_; i++) {
-
-		//コンスタントバッファに情報を渡す
-		CONSTANT_BUFFER cb;
-		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
-		cb.matNormal = XMMatrixTranspose(transform.GetNormalMatrix());
-		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
-
-
-		//各光の情報を入れる
-		cb.diffuseColor = pMaterialList_[i].diffuse;
-		cb.ambientColor = pMaterialList_[i].ambient;
-		cb.specularColor = pMaterialList_[i].specular;
-		cb.shininess = pMaterialList_[i].shininess;
-
-		cb.hasTexture = false;
-		cb.hasNormalMap = pMaterialList_[i].pNormalMap != nullptr;
-
-		cb.scroll = -scrollVal_;
-
-		Direct3D::pContext_->UpdateSubresource(pConstantBuffer_, 0, NULL, &cb, 0, 0);
-
-		//頂点バッファ
-		UINT stride = sizeof(VERTEX);
-		UINT offset = 0;
-		Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
-
-		// インデックスバッファーをセット
-		stride = sizeof(int);
-		offset = 0;
-		Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
-
-		Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_); //頂点シェーダー用
-		Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_); //ピクセルシェーダー用
-
-		if (pMaterialList_[i].pNormalMap) {
 
 			ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
 			Direct3D::pContext_->PSSetShaderResources(1, 1, &pSRV);
@@ -479,8 +494,6 @@ void Fbx::Draw(Transform& transform)
 		Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0); //インデックス情報の数は何個数字を入れてるか
 
 	}
-
-	
 	
 }
 
