@@ -388,7 +388,7 @@ void Fbx::Draw(Transform& transform)
 		cb.shininess = pMaterialList_[i].shininess;
 
 		cb.hasTexture = pMaterialList_[i].pTexture != nullptr;
-		cb.hasNormalMap = pMaterialList_[i].pNormalMap != nullptr;
+		cb.hasNormalMap = false;
 
 		cb.scroll = 0.0f;
 
